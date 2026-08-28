@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Form Permintaan ATK Triwulan</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+      body { 
+        background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%); 
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+      }
+      .main-container { width: 100%; max-width: 750px; margin: 0 auto; }
+      .card-form { border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0, 56, 179, 0.04); background: #ffffff; overflow: hidden; width: 100%; }
+      .brand-header { background: linear-gradient(135deg, #0056b3 0%, #003d82 100%); padding: 1.5rem; text-align: center; color: white; }
+      .logo-container { width: 75px; height: 75px; background-color: #ffffff; border-radius: 50%; margin: 0 auto 0.8rem auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 6px; }
+      .logo-container img { width: 100%; height: 100%; object-fit: contain; }
+      .form-section { padding: 2.5rem; }
+      .inner-card { border-radius: 15px; border: 1px solid #eef2f7; background-color: #fafdff; padding: 1.5rem; }
+      .form-label { font-weight: 600; color: #4a5568; font-size: 0.9rem; }
+      .form-control, .form-select { border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 0.6rem 1rem; font-size: 0.95rem; }
+      .btn-add { background: #17a2b8; border: none; color: white; border-radius: 10px; font-weight: 600; padding: 0.7rem; }
+      .btn-add:hover { background: #138496; color: white; }
+      .btn-submit { background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); border: none; border-radius: 12px; }
+      .loading-overlay { font-size: 0.85rem; font-weight: 500; color: #64748b; }
+      .spinner-custom { width: 1.2rem; height: 1.2rem; border-width: 0.18em; }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="card card-form">
+        <div class="brand-header">
+          <div class="logo-container">
+            <img src="https://i.ibb.co.com/hR56HGdP/Logo-Maranatha-Universitas-Kristen-Maranatha-Original-PNG.png" alt="Logo Maranatha">
+          </div>
+          <h4 class="fw-bold mb-1">E-Form Permintaan ATK Triwulan</h4>
+          <p class="mb-0 opacity-75 small">Sistem Pengajuan Multi-Item (GitHub Hosted)</p>
+        </div>
+        
+        <div class="form-section">
+          <form id="atkForm">
+            <div class="mb-4">
+              <label class="form-label mb-2">🏢 Nama Unit Kerja / Direktorat Anda</label>
+              <div id="unitLoading" class="loading-overlay mb-2">
+                <div class="spinner-border spinner-custom text-primary me-2" role="status"></div> Memuat daftar unit kerja...
+              </div>
+              <select id="dropdownUnit" class="form-select shadow-sm" onchange="updateUnitMeta()" style="display:none;" required>
+                <option value="">-- Pilih Unit Kerja Anda --</option>
+              </select>
+              <input type="hidden" id="lokasiUnit">
+            </div>
+
+            <div class="inner-card mb-4">
+              <h6 class="fw-bold text-dark mb-3"><span class="badge bg-primary me-2">Step 2</span> Tambah Item Barang ke Keranjang</h6>
+              <input type="hidden" id="vendorTarget">
+              <input type="hidden" id="deskripsiBarang">
+              <input type="hidden" id="satuanBarang">
+              <input type="hidden" id="merkBarang">
+              <input type="hidden" id="hargaBarang">
+
+              <div class="mb-3">
+                <label class="form-label small mb-1">📦 Pilih Barang / Material</label>
+                <div id="materialLoading" class="loading-overlay mb-2">
+                  <div class="spinner-border spinner-custom text-primary me-2" role="status"></div> Memuat database material barang...
+                </div>
+                <select id="dropdownMaterial" class="form-select shadow-sm" onchange="updateMaterialMeta()" style="display:none;">
+                  <option value="">-- Pilih Kode & Deskripsi --</option>
+                </select>
+                <div id="vendorBadge" class="form-text text-primary fw-bold mt-2" style="font-size: 0.85rem;"></div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small mb-1">🔢 Jumlah Permintaan</label>
+                <input type="number" id="jumlah" class="form-control shadow-sm" min="1" placeholder="Masukkan jumlah angka">
+              </div>
+
+              <button type="button" onclick="tambahKeDaftar()" class="btn btn-add w-100 fw-bold shadow-sm mt-2">➕ Masukkan ke Keranjang</button>
+            </div>
+          </form>
+
+          <div id="tabelKeranjangArea" class="card p-3 border-0 bg-light" style="display:none; border-radius:15px;">
+            <h6 class="fw-bold text-dark mb-3">🛒 Daftar Keranjang Pengajuan Anda:</h6>
+            <div class="table-responsive rounded-3 overflow-hidden shadow-sm bg-white">
+              <table class="table table-hover table-striped align-middle mb-0 small">
+                <thead class="table-dark">
+                  <tr><th class="ps-3">Kode</th><th>Nama Barang</th><th>Vendor</th><th class="text-center">Jumlah</th><th class="text-center pe-3">Aksi</th></tr>
+                </thead>
+                <tbody id="bodyKeranjang"></tbody>
+              </table>
+            </div>
+            <button type="button" id="btnSubmit" onclick="kirimSemuaData()" class="btn btn-submit text-white w-100 fw-bold py-2.5 mt-3 shadow">🚀 Kirim Pengajuan & Unduh Berkas Gabungan (.XLS)</button>
+          </div>
+          
+          <div id="output" class="text-center mt-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ⚠️ GANTI URL DI BAWAH INI DENGAN WEB APP URL DARI GOOGLE APPS SCRIPT ANDA
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby.../exec";
+
+      var globalMaterials = [];
+      var globalUnits = [];
+      var keranjangBarang = [];
+
+      window.onload = function() {
+        loadMaterials();
+        loadUnits();
+      };
+
+      function loadMaterials() {
+        fetch(WEB_APP_URL + "?action=getMaterial")
+          .then(res => res.json())
+          .then(list => {
+            globalMaterials = list;
+            var select = document.getElementById("dropdownMaterial");
+            var loader = document.getElementById("materialLoading");
+            
+            select.innerHTML = '<option value="">-- Pilih Kode & Deskripsi --</option>';
+            list.forEach(item => {
+              var opt = document.createElement('option');
+              opt.value = item.kode;
+              opt.innerHTML = item.kode + " - " + item.deskripsi;
+              select.appendChild(opt);
+            });
+            loader.style.display = "none";
+            select.style.display = "block";
+          })
+          .catch(err => {
+            document.getElementById("materialLoading").innerHTML = "❌ Gagal memuat material.";
+            console.error(err);
+          });
+      }
+
+      function loadUnits() {
+        fetch(WEB_APP_URL + "?action=getUnit")
+          .then(res => res.json())
+          .then(list => {
+            globalUnits = list;
+            var select = document.getElementById("dropdownUnit");
+            var loader = document.getElementById("unitLoading");
+            
+            select.innerHTML = '<option value="">-- Pilih Unit Kerja Anda --</option>';
+            list.forEach(item => {
+              var opt = document.createElement('option');
+              opt.value = item.namaUnit;
+              opt.innerHTML = item.namaUnit;
+              select.appendChild(opt);
+            });
+            loader.style.display = "none";
+            select.style.display = "block";
+          })
+          .catch(err => {
+            document.getElementById("unitLoading").innerHTML = "❌ Gagal memuat unit.";
+            console.error(err);
+          });
+      }
+
+      function updateMaterialMeta() {
+        var val = document.getElementById("dropdownMaterial").value;
+        var item = globalMaterials.find(i => i.kode === val);
+        if (item) {
+          document.getElementById("vendorTarget").value = item.vendor;
+          document.getElementById("deskripsiBarang").value = item.deskripsi;
+          document.getElementById("satuanBarang").value = item.satuan;
+          document.getElementById("merkBarang").value = item.merk;
+          document.getElementById("hargaBarang").value = item.harga;
+          document.getElementById("vendorBadge").innerHTML = "🏢 Vendor: " + item.vendor + " | 💰 Harga: Rp " + item.harga.toLocaleString('id-ID');
+        } else {
+          document.getElementById("vendorBadge").innerHTML = "";
+        }
+      }
+
+      function updateUnitMeta() {
+        var val = document.getElementById("dropdownUnit").value;
+        var item = globalUnits.find(i => i.namaUnit === val);
+        if (item) { document.getElementById("lokasiUnit").value = item.lokasi; }
+      }
+
+      function tambahKeDaftar() {
+        var unitSelect = document.getElementById("dropdownUnit");
+        if(!unitSelect.value) {
+          alert("Silakan pilih Nama Unit Anda terlebih dahulu!");
+          unitSelect.focus();
+          return;
+        }
+
+        var kode = document.getElementById("dropdownMaterial").value;
+        var jml = document.getElementById("jumlah").value;
+
+        if(!kode || !jml || jml < 1) {
+          alert("Silakan pilih barang dan masukkan jumlah permintaan yang valid!");
+          return;
+        }
+
+        keranjangBarang.push({
+          kodeMaterial: kode,
+          jumlah: jml,
+          vendorTarget: document.getElementById("vendorTarget").value,
+          deskripsiBarang: document.getElementById("deskripsiBarang").value,
+          satuanBarang: document.getElementById("satuanBarang").value,
+          merkBarang: document.getElementById("merkBarang").value,
+          hargaBarang: document.getElementById("hargaBarang").value
+        });
+
+        unitSelect.disabled = true;
+        document.getElementById("dropdownMaterial").value = "";
+        document.getElementById("jumlah").value = "";
+        document.getElementById("vendorBadge").innerHTML = "";
+        renderTabelKeranjang();
+      }
+
+      function renderTabelKeranjang() {
+        var tbody = document.getElementById("bodyKeranjang");
+        var area = document.getElementById("tabelKeranjangArea");
+        tbody.innerHTML = "";
+
+        if(keranjangBarang.length === 0) {
+          area.style.display = "none";
+          document.getElementById("dropdownUnit").disabled = false;
+          return;
+        }
+
+        area.style.display = "block";
+        keranjangBarang.forEach((item, index) => {
+          var tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${item.kodeMaterial}</td>
+            <td>${item.deskripsiBarang}</td>
+            <td><span class="badge bg-primary">${item.vendorTarget}</span></td>
+            <td class="text-center fw-bold">${item.jumlah}</td>
+            <td><button type="button" class="btn btn-danger btn-sm py-0" onclick="hapusItemKeranjang(${index})">Hapus</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function hapusItemKeranjang(index) {
+        keranjangBarang.splice(index, 1);
+        renderTabelKeranjang();
+      }
+
+      function kirimSemuaData() {
+        var btn = document.getElementById("btnSubmit");
+        var div = document.getElementById("output");
+
+        if(keranjangBarang.length === 0) return;
+
+        btn.disabled = true;
+        div.innerHTML = '<div class="alert alert-warning fw-bold">Sedang mendistribusikan data ke masing-masing vendor & menyusun berkas Excel gabungan...</div>';
+
+        var finalPayload = {
+          namaUnit: document.getElementById("dropdownUnit").value,
+          lokasiUnit: document.getElementById("lokasiUnit").value,
+          items: keranjangBarang
+        };
+
+        fetch(WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify(finalPayload)
+        })
+        .then(res => res.json())
+        .then(res => {
+          if(res && res.status === "Sukses") {
+            div.innerHTML = `
+              <div class="alert alert-success fw-bold">✅ Semua Permintaan Berhasil Terdistribusi Ke Sheet Masing-Masing Vendor!</div>
+              <div class="card p-3 mt-2" style="border: 2px dashed #007bff; background-color: #f8f9fa;">
+                <p class="text-muted small mb-2 fw-semibold">Silakan unduh berkas rekap cetak pengajuan fisik Anda di bawah ini:</p>
+                <button type="button" class="btn btn-primary fw-bold w-100 py-2" onclick="unduhBerkasHasil('${res.excelData}', '${res.fileName}')">📥 Unduh Berkas Excel Gabungan (.xls)</button>
+              </div>`;
+            keranjangBarang = [];
+            renderTabelKeranjang();
+            document.getElementById("dropdownUnit").disabled = false;
+          } else {
+            div.innerHTML = '<div class="alert alert-danger fw-bold">❌ Gagal: ' + res.message + '</div>';
+            btn.disabled = false;
+          }
+        })
+        .catch(err => {
+          div.innerHTML = '<div class="alert alert-danger fw-bold">❌ Terjadi kesalahan jaringan.</div>';
+          btn.disabled = false;
+        });
+      }
+
+      function unduhBerkasHasil(base64, fileName) {
+        var byteCharacters = atob(base64);
+        var byteNumbers = new Array(byteCharacters.length);
+        for (var i = 0; i < byteCharacters.length; i++) { byteNumbers[i] = byteCharacters.charCodeAt(i); }
+        var byteArray = new Uint8Array(byteNumbers);
+        var blob = new Blob([byteArray], {type: "application/vnd.ms-excel"});
+        var link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    </script>
+  </body>
+</html>
