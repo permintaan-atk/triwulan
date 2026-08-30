@@ -123,7 +123,7 @@
         loadUnits();
       };
 
-      function loadMaterials() {
+    function loadMaterials() {
         fetch(WEB_APP_URL + "?action=getMaterial")
           .then(res => res.json())
           .then(list => {
@@ -131,11 +131,17 @@
             var select = document.getElementById("dropdownMaterial");
             var loader = document.getElementById("materialLoading");
             
-            select.innerHTML = '<option value="">-- Pilih Kode & Deskripsi --</option>';
+            select.innerHTML = '<option value="">-- Pilih Kode, Deskripsi & Harga --</option>';
             list.forEach(item => {
               var opt = document.createElement('option');
               opt.value = item.kode;
-              opt.innerHTML = item.kode + " - " + item.deskripsi;
+              
+              // Memformat angka harga menjadi format ribuan (Rupiah)
+              var hargaFormatted = Number(item.harga || 0).toLocaleString("id-ID");
+              
+              // Menggabungkan Kode, Deskripsi, dan Harga
+              opt.innerHTML = item.kode + " - " + item.deskripsi + " (Rp " + hargaFormatted + ")";
+              
               select.appendChild(opt);
             });
             loader.style.display = "none";
@@ -146,7 +152,6 @@
             console.error(err);
           });
       }
-
       function loadUnits() {
         fetch(WEB_APP_URL + "?action=getUnit")
           .then(res => res.json())
