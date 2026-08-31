@@ -302,38 +302,43 @@
         });
       }
 
-     function downloadMultiSheetExcel() {
-    // Tampilkan indikator loading jika perlu
-    var btn = document.getElementById("btnDownload"); // Sesuaikan dengan id tombol unduh Anda
-    if(btn) btn.innerText = "Memproses Excel...";
+     async function downloadMultiSheetExcel() {
+    var btn = document.getElementById("btnDownload");
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "Sedang menyiapkan Excel...";
+    }
 
-    // Ambil data dari masing-masing sheet vendor secara paralel lewat Web App
     var vendorNames = ["CV BLUEPINDO JAYA", "SINTERA", "CV PELITA KASIH"];
     var workbook = XLSX.utils.book_new();
 
-    // Fungsi helper untuk fetch data per sheet/vendor
-    var promises = vendorNames.map(function(vendor) {
-        // Anda bisa membuat action khusus di Code.gs untuk mengambil data per sheet vendor, 
-        // atau mengambil semua data lalu difilter di sini.
-        return fetch(WEB_APP_URL + "?action=getDataPerSheet&sheet=" + encodeURIComponent(vendor))
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "Sukses" && data.rows) {
-                    var ws = XLSX.utils.aoa_to_sheet(data.rows);
-                    XLSX.utils.book_append_sheet(workbook, ws, vendor);
-                }
-            });
-    });
+    try {
+        // Ambil data satu per satu agar stabil dan tidak gagal
+        for (let i = 0; i < vendorNames.length; i++) {
+            let vendor = vendorNames[i];
+            if(btn) btn.innerText = "Mengambil data: " + vendor + "...";
 
-    Promise.all(promises).then(function() {
-        // Simpan dan unduh file Excel (.xlsx) dengan multi-sheet
+            let response = await fetch(WEB_APP_URL + "?action=getDataPerSheet&sheet=" + encodeURIComponent(vendor));
+            let data = await response.json();
+
+            if (data.status === "Sukses" && data.rows) {
+                var ws = XLSX.utils.aoa_to_sheet(data.rows);
+                XLSX.utils.book_append_sheet(workbook, ws, vendor);
+            }
+        }
+
+        if(btn) btn.innerText = "Menyimpan file Excel...";
         XLSX.writeFile(workbook, "Rekap_ATK_Multi_Vendor.xlsx");
-        if(btn) btn.innerText = "Download Excel";
-    }).catch(err => {
+        
+    } catch (err) {
         console.error(err);
-        alert("Gagal mengunduh file Excel.");
-        if(btn) btn.innerText = "Download Excel";
-    });
+        alert("Gagal mengunduh file Excel. Periksa kembali koneksi internet Anda.");
+    } finally {
+        if(btn) {
+            btn.disabled = false;
+            btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+        }
+    }
 }
     </script>
   </body>
