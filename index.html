@@ -302,41 +302,71 @@
         });
       }
 
-     async function downloadMultiSheetExcel() {
+    async function downloadMultiSheetExcel() {
     var btn = document.getElementById("btnDownload");
     if(btn) {
         btn.disabled = true;
-        btn.innerText = "Sedang menyiapkan Excel...";
+        btn.innerText = "Menyiapkan Excel Khusus Unit Anda...";
+    }
+
+    // Ambil nama unit kerja yang sedang aktif dipilih di dropdown
+    var activeUnit = document.getElementById("dropdownUnit").value;
+    if (!activeUnit) {
+        alert("Pilih unit kerja terlebih dahulu!");
+        if(btn) btn.disabled = false;
+        return;
     }
 
     var vendorNames = ["CV BLUEPINDO JAYA", "SINTERA", "CV PELITA KASIH"];
     var workbook = XLSX.utils.book_new();
+    var adaDataUnit = false;
 
     try {
-        // Ambil data satu per satu agar stabil dan tidak gagal
         for (let i = 0; i < vendorNames.length; i++) {
             let vendor = vendorNames[i];
-            if(btn) btn.innerText = "Mengambil data: " + vendor + "...";
+            if(btn) btn.innerText = "Memeriksa vendor: " + vendor + "...";
 
+            // Tarik data mentah per sheet vendor dari server Google Spreadsheet
             let response = await fetch(WEB_APP_URL + "?action=getDataPerSheet&sheet=" + encodeURIComponent(vendor));
             let data = await response.json();
 
-            if (data.status === "Sukses" && data.rows) {
-                var ws = XLSX.utils.aoa_to_sheet(data.rows);
-                XLSX.utils.book_append_sheet(workbook, ws, vendor);
+            if (data.status === "Sukses" && data.rows && data.rows.length > 0) {
+                let allRows = data.rows;
+                let header = allRows[0]; // Baris pertama adalah judul kolom (Header)
+                
+                // Saring baris: Ambil header dan hanya baris yang kolom nama unitnya SAMA DENGAN unit aktif
+                // (Asumsi kolom Nama Unit berada di indeks ke-1, sesuaikan jika posisi kolomnya berbeda)
+                let filteredRows = allRows.filter((row, index) => {
+                    if (index === 0) return true; // Selalu sertakan header
+                    // Sesuaikan indeks kolom unit (misal: row[1] adalah kolom Nama Unit)
+                    return String(row[1]).trim().toLowerCase() === activeUnit.trim().toLowerCase();
+                });
+
+                // Jika ada data milik unit ini di vendor tersebut, masukkan ke tab Excel
+                if (filteredRows.length > 1) {
+                    adaDataUnit = true;
+                    var ws = XLSX.utils.aoa_to_sheet(filteredRows);
+                    var safeSheetName = vendor.substring(0, 31);
+                    XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
+                }
             }
         }
 
-        if(btn) btn.innerText = "Menyimpan file Excel...";
-        XLSX.writeFile(workbook, "Rekap_ATK_Multi_Vendor.xlsx");
+        if (!adaDataUnit) {
+            alert("Belum ada riwayat pengajuan data untuk unit " + activeUnit + ".");
+        } else {
+            if(btn) btn.innerText = "Menyimpan file Excel...";
+            var namaFileClean = activeUnit.replace(/[^a-zA-Z0-9]/g, "_");
+            XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
+        }
         
     } catch (err) {
         console.error(err);
-        alert("Gagal mengunduh file Excel. Periksa kembali koneksi internet Anda.");
+        alert("Gagal mengunduh file Excel. Periksa koneksi Anda.");
     } finally {
         if(btn) {
             btn.disabled = false;
-            btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+            btn.innerText = "📥 Unduh Berkas Excel Per Unit (.xlsx)";
         }
     }
 }
