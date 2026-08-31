@@ -336,8 +336,13 @@
                 
                 let filteredRows = allRows.filter((row, index) => {
                     if (index === 0) return true; // Selalu sertakan header
-                    // Sesuaikan indeks kolom unit (misal: row[1] adalah kolom Nama Unit)
-                    return String(row[1]).trim().toLowerCase() === activeUnit.trim().toLowerCase();
+                    
+                    // Ambil teks dari kolom Nama Unit (sesuaikan angka indeksnya jika perlu, misal row[1] atau row[2])
+                    let cellUnit = String(row[1] || "").trim().toLowerCase();
+                    let targetUnit = activeUnit.trim().toLowerCase();
+
+                    // Cocokkan apakah baris tersebut milik unit yang sedang aktif
+                    return cellUnit.includes(targetUnit) || targetUnit.includes(cellUnit);
                 });
 
                 // Jika ada data milik unit ini di vendor tersebut, masukkan ke tab Excel
