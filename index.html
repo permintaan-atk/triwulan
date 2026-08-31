@@ -306,55 +306,42 @@
         });
       }
 
-function downloadMultiSheetExcel() {
+async function downloadMultiSheetExcel() {
     var btn = document.getElementById("btnDownload");
     if(btn) {
         btn.disabled = true;
-        btn.innerText = "Menyiapkan Excel per Unit...";
+        btn.innerText = "Menyiapkan Excel per Vendor...";
     }
 
-    var itemsArray = window.savedKeranjang || [];
-    var namaUnit = window.savedNamaUnit || "Unit Kerja";
-
-    if (itemsArray.length === 0) {
-        alert("Data keranjang kosong.");
-        if(btn) btn.disabled = false;
-        return;
-    }
-
+    var vendorNames = ["CV BLUEPINDO JAYA", "SINTERA", "CV PELITA KASIH"];
     var workbook = XLSX.utils.book_new();
 
-    var groupedByVendor = {};
-    itemsArray.forEach(item => {
-        var v = item.vendorTarget || "Lainnya";
-        if (!groupedByVendor[v]) {
-            groupedByVendor[v] = [];
-            groupedByVendor[v].push(["Nama Unit", "Kode", "Deskripsi Barang", "Satuan", "Merk", "Jumlah", "Harga"]);
+    try {
+        for (let i = 0; i < vendorNames.length; i++) {
+            let vendor = vendorNames[i];
+            if(btn) btn.innerText = "Mengambil data: " + vendor + "...";
+
+            let response = await fetch(WEB_APP_URL + "?action=getDataPerSheet&sheet=" + encodeURIComponent(vendor));
+            let data = await response.json();
+
+            if (data.status === "Sukses" && data.rows) {
+                var ws = XLSX.utils.aoa_to_sheet(data.rows);
+                var safeSheetName = vendor.substring(0, 31);
+                XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
+            }
         }
-        groupedByVendor[v].push([
-            namaUnit,
-            item.kodeMaterial,
-            item.deskripsiBarang,
-            item.satuanBarang,
-            item.merkBarang,
-            item.jumlah,
-            item.hargaBarang
-        ]);
-    });
 
-    for (var vendorName in groupedByVendor) {
-        var rowsData = groupedByVendor[vendorName];
-        var ws = XLSX.utils.aoa_to_sheet(rowsData);
-        var safeSheetName = vendorName.substring(0, 31);
-        XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
-    }
-
-    var namaFileClean = namaUnit.replace(/[^a-zA-Z0-9]/g, "_");
-    XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
-
-    if(btn) {
-        btn.disabled = false;
-        btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+        if(btn) btn.innerText = "Menyimpan file Excel...";
+        XLSX.writeFile(workbook, "Rekap_ATK_Multi_Vendor.xlsx");
+        
+    } catch (err) {
+        console.error(err);
+        alert("Gagal mengunduh file Excel. Periksa koneksi Anda.");
+    } finally {
+        if(btn) {
+            btn.disabled = false;
+            btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+        }
     }
 }
     </script>
