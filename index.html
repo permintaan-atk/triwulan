@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
       body { 
         background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%); 
@@ -301,19 +301,39 @@
         });
       }
 
-      function unduhBerkasHasil(base64, fileName) {
-        var byteCharacters = atob(base64);
-        var byteNumbers = new Array(byteCharacters.length);
-        for (var i = 0; i < byteCharacters.length; i++) { byteNumbers[i] = byteCharacters.charCodeAt(i); }
-        var byteArray = new Uint8Array(byteNumbers);
-        var blob = new Blob([byteArray], {type: "application/vnd.ms-excel"});
-        var link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+     function downloadMultiSheetExcel() {
+    // Tampilkan indikator loading jika perlu
+    var btn = document.getElementById("btnDownload"); // Sesuaikan dengan id tombol unduh Anda
+    if(btn) btn.innerText = "Memproses Excel...";
+
+    // Ambil data dari masing-masing sheet vendor secara paralel lewat Web App
+    var vendorNames = ["CV BLUEPINDO JAYA", "SINTERA", "CV PELITA KASIH"];
+    var workbook = XLSX.utils.book_new();
+
+    // Fungsi helper untuk fetch data per sheet/vendor
+    var promises = vendorNames.map(function(vendor) {
+        // Anda bisa membuat action khusus di Code.gs untuk mengambil data per sheet vendor, 
+        // atau mengambil semua data lalu difilter di sini.
+        return fetch(WEB_APP_URL + "?action=getDataPerSheet&sheet=" + encodeURIComponent(vendor))
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "Sukses" && data.rows) {
+                    var ws = XLSX.utils.aoa_to_sheet(data.rows);
+                    XLSX.utils.book_append_sheet(workbook, ws, vendor);
+                }
+            });
+    });
+
+    Promise.all(promises).then(function() {
+        // Simpan dan unduh file Excel (.xlsx) dengan multi-sheet
+        XLSX.writeFile(workbook, "Rekap_ATK_Multi_Vendor.xlsx");
+        if(btn) btn.innerText = "Download Excel";
+    }).catch(err => {
+        console.error(err);
+        alert("Gagal mengunduh file Excel.");
+        if(btn) btn.innerText = "Download Excel";
+    });
+}
     </script>
   </body>
 </html>
