@@ -334,8 +334,6 @@
                 let allRows = data.rows;
                 let header = allRows[0]; // Baris pertama adalah judul kolom (Header)
                 
-                // Saring baris: Ambil header dan hanya baris yang kolom nama unitnya SAMA DENGAN unit aktif
-                // (Asumsi kolom Nama Unit berada di indeks ke-1, sesuaikan jika posisi kolomnya berbeda)
                 let filteredRows = allRows.filter((row, index) => {
                     if (index === 0) return true; // Selalu sertakan header
                     // Sesuaikan indeks kolom unit (misal: row[1] adalah kolom Nama Unit)
