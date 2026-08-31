@@ -284,13 +284,14 @@
             div.innerHTML = `
               <div class="alert alert-success fw-bold">✅ Semua Permintaan Berhasil Terdistribusi Ke Sheet Masing-Masing Vendor!</div>
               <div class="card p-3 mt-2" style="border: 2px dashed #007bff; background-color: #f8f9fa;">
-                <p class="text-muted small mb-2 fw-semibold">Silakan unduh berkas rekap cetak pengajuan fisik Anda di bawah ini:</p>
-                <button type="button" class="btn btn-primary fw-bold w-100 py-2" onclick="unduhBerkasHasil('${res.excelData}', '${res.fileName}')">📥 Unduh Berkas Excel Gabungan (.xls)</button>
+                <p class="text-muted small mb-2 fw-semibold">Silakan unduh berkas rekap multi-tab per vendor di bawah ini:</p>
+                <button type="button" id="btnDownload" class="btn btn-primary fw-bold w-100 py-2" onclick="downloadMultiSheetExcel()">📥 Unduh Berkas Excel Multi-Tab (.xlsx)</button>
               </div>`;
             keranjangBarang = [];
             renderTabelKeranjang();
             document.getElementById("dropdownUnit").disabled = false;
-          } else {
+          }
+          else {
             div.innerHTML = '<div class="alert alert-danger fw-bold">❌ Gagal: ' + res.message + '</div>';
             btn.disabled = false;
           }
