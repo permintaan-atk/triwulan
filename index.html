@@ -265,7 +265,8 @@
 
         btn.disabled = true;
         div.innerHTML = '<div class="alert alert-warning fw-bold">Sedang mendistribusikan data ke masing-masing vendor & menyusun berkas Excel gabungan...</div>';
-
+        
+        window.lastSubmittedItems = [...keranjangBarang];
         var finalPayload = {
           namaUnit: document.getElementById("dropdownUnit").value,
           lokasiUnit: document.getElementById("lokasiUnit").value,
