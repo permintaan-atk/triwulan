@@ -301,29 +301,24 @@
           }
         })
 
-     function downloadMultiSheetExcel() {
+     function downloadMultiSheetExcel(itemsArray, namaUnit) {
     var btn = document.getElementById("btnDownload");
     if(btn) {
         btn.disabled = true;
         btn.innerText = "Menyiapkan Excel per Unit...";
     }
 
-    // Ambil nama unit yang sedang aktif
-    var namaUnit = document.getElementById("dropdownUnit").value || "Unit Kerja";
-    var workbook = XLSX.utils.book_new();
-
-    // Ambil data item dari keranjang global yang baru saja dikirim
-    // (Pastikan variabel keranjangBarang masih menyimpan data sebelum dikosongkan, 
-    // atau kita buat salinannya saat tombol kirim ditekan)
-    if (!window.lastSubmittedItems || window.lastSubmittedItems.length === 0) {
+    if (!itemsArray || itemsArray.length === 0) {
         alert("Data keranjang kosong.");
         if(btn) btn.disabled = false;
         return;
     }
 
-    // Kelompokkan item keranjang berdasarkan vendornya masing-masing
+    var workbook = XLSX.utils.book_new();
+
+    // Kelompokkan item berdasarkan vendornya masing-masing
     var groupedByVendor = {};
-    window.lastSubmittedItems.forEach(item => {
+    itemsArray.forEach(item => {
         var v = item.vendorTarget || "Lainnya";
         if (!groupedByVendor[v]) {
             groupedByVendor[v] = [];
@@ -331,7 +326,7 @@
             groupedByVendor[v].push(["Nama Unit", "Kode", "Deskripsi Barang", "Satuan", "Merk", "Jumlah", "Harga"]);
         }
         groupedByVendor[v].push([
-            namaUnit,
+            namaUnit || "Unit Kerja",
             item.kodeMaterial,
             item.deskripsiBarang,
             item.satuanBarang,
@@ -345,19 +340,19 @@
     for (var vendorName in groupedByVendor) {
         var rowsData = groupedByVendor[vendorName];
         var ws = XLSX.utils.aoa_to_sheet(rowsData);
-        // Batasi nama tab maksimal 31 karakter (aturan Excel)
-        var safeSheetName = vendorName.substring(0, 31);
+        var safeSheetName = vendorName.substring(0, 31); // Batasan maksimal 31 karakter nama sheet Excel
         XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
     }
 
-    // Simpan file Excel
-    XLSX.writeFile(workbook, "Rekap_ATK_" + namaUnit.replace(/[^a-zA-Z0-9]/g, "_") + ".xlsx");
+    // Unduh file Excel (.xlsx)
+    var namaFileClean = (namaUnit || "Rekap").replace(/[^a-zA-Z0-9]/g, "_");
+    XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
 
     if(btn) {
         btn.disabled = false;
         btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
     }
-}
-    </script>
+} 
+        </script>
   </body>
 </html>
