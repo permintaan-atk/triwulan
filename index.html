@@ -10,7 +10,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- PWA Manifest untuk Install Aplikasi -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0056b3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
       body { 
         background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%); 
@@ -109,7 +114,7 @@
 
     <script>
       // ⚠️ GANTI URL DI BAWAH INI DENGAN WEB APP URL DARI GOOGLE APPS SCRIPT ANDA
-      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyOY7wLOY5Nsf6i8Ob5kMEktnbFq8VnZ7jLNe4BRx726iAmTyNXtkGAXm59drtI2s3M/exec";
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqY3E8sUH5iaG-CPA0AgHNdNMmhy2UmoW97BKp2WOOSQNXu5y7kafZPVEaYQ4-xaWC/exec";
 
       var globalMaterials = [];
       var globalUnits = [];
@@ -260,7 +265,8 @@
 
         btn.disabled = true;
         div.innerHTML = '<div class="alert alert-warning fw-bold">Sedang mendistribusikan data ke masing-masing vendor & menyusun berkas Excel gabungan...</div>';
-
+        
+        window.lastSubmittedItems = [...keranjangBarang];
         var finalPayload = {
           namaUnit: document.getElementById("dropdownUnit").value,
           lokasiUnit: document.getElementById("lokasiUnit").value,
@@ -273,13 +279,19 @@
         })
         .then(res => res.json())
         .then(res => {
+.then(res => {
           if(res && res.status === "Sukses") {
+            // Simpan salinan keranjang ke variabel lokal sebelum dikosongkan
+            let dataBerhasilDiKirim = [...keranjangBarang];
+            let namaUnitAktif = document.getElementById("dropdownUnit").value;
+
             div.innerHTML = `
               <div class="alert alert-success fw-bold">✅ Semua Permintaan Berhasil Terdistribusi Ke Sheet Masing-Masing Vendor!</div>
               <div class="card p-3 mt-2" style="border: 2px dashed #007bff; background-color: #f8f9fa;">
-                <p class="text-muted small mb-2 fw-semibold">Silakan unduh berkas rekap cetak pengajuan fisik Anda di bawah ini:</p>
-                <button type="button" class="btn btn-primary fw-bold w-100 py-2" onclick="unduhBerkasHasil('${res.excelData}', '${res.fileName}')">📥 Unduh Berkas Excel Gabungan (.xls)</button>
+                <p class="text-muted small mb-2 fw-semibold">Silakan unduh berkas rekap multi-tab per vendor di bawah ini:</p>
+                <button type="button" id="btnDownload" class="btn btn-primary fw-bold w-100 py-2" onclick='downloadMultiSheetExcel(${JSON.stringify(dataBerhasilDiKirim)}, "${namaUnitAktif}")'>📥 Unduh Berkas Excel Multi-Tab (.xlsx)</button>
               </div>`;
+            
             keranjangBarang = [];
             renderTabelKeranjang();
             document.getElementById("dropdownUnit").disabled = false;
@@ -288,25 +300,59 @@
             btn.disabled = false;
           }
         })
-        .catch(err => {
-          div.innerHTML = '<div class="alert alert-danger fw-bold">❌ Terjadi kesalahan jaringan.</div>';
-          btn.disabled = false;
-        });
-      }
 
-      function unduhBerkasHasil(base64, fileName) {
-        var byteCharacters = atob(base64);
-        var byteNumbers = new Array(byteCharacters.length);
-        for (var i = 0; i < byteCharacters.length; i++) { byteNumbers[i] = byteCharacters.charCodeAt(i); }
-        var byteArray = new Uint8Array(byteNumbers);
-        var blob = new Blob([byteArray], {type: "application/vnd.ms-excel"});
-        var link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    </script>
+     function downloadMultiSheetExcel(itemsArray, namaUnit) {
+    var btn = document.getElementById("btnDownload");
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "Menyiapkan Excel per Unit...";
+    }
+
+    if (!itemsArray || itemsArray.length === 0) {
+        alert("Data keranjang kosong.");
+        if(btn) btn.disabled = false;
+        return;
+    }
+
+    var workbook = XLSX.utils.book_new();
+
+    // Kelompokkan item berdasarkan vendornya masing-masing
+    var groupedByVendor = {};
+    itemsArray.forEach(item => {
+        var v = item.vendorTarget || "Lainnya";
+        if (!groupedByVendor[v]) {
+            groupedByVendor[v] = [];
+            // Tambahkan baris Header untuk tabel Excel di tab tersebut
+            groupedByVendor[v].push(["Nama Unit", "Kode", "Deskripsi Barang", "Satuan", "Merk", "Jumlah", "Harga"]);
+        }
+        groupedByVendor[v].push([
+            namaUnit || "Unit Kerja",
+            item.kodeMaterial,
+            item.deskripsiBarang,
+            item.satuanBarang,
+            item.merkBarang,
+            item.jumlah,
+            item.hargaBarang
+        ]);
+    });
+
+    // Buat Sheet/Tab terpisah untuk setiap vendor di file Excel
+    for (var vendorName in groupedByVendor) {
+        var rowsData = groupedByVendor[vendorName];
+        var ws = XLSX.utils.aoa_to_sheet(rowsData);
+        var safeSheetName = vendorName.substring(0, 31); // Batasan maksimal 31 karakter nama sheet Excel
+        XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
+    }
+
+    // Unduh file Excel (.xlsx)
+    var namaFileClean = (namaUnit || "Rekap").replace(/[^a-zA-Z0-9]/g, "_");
+    XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
+
+    if(btn) {
+        btn.disabled = false;
+        btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+    }
+} 
+        </script>
   </body>
 </html>
