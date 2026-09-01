@@ -377,6 +377,8 @@
             rowsData.push(footerCatatan);
 
             var ws = XLSX.utils.aoa_to_sheet(rowsData);
+            if (!ws['!views']) ws['!views'] = [{ showGridLines: true }];
+            else ws['!views'][0].showGridLines = true;
             var safeSheetName = vendorName.substring(0, 31);
             XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
         }
