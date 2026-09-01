@@ -3,16 +3,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Form Permintaan ATK Triwulan</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PWA Manifest untuk Install Aplikasi -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0056b3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>E-Form Permintaan ATK Triwulan</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
     <style>
       body { 
         background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%); 
@@ -40,7 +43,6 @@
     </style>
   </head>
   <body>
-    
     <div class="main-container">
       <div class="card card-form">
         <div class="brand-header">
@@ -48,7 +50,7 @@
             <img src="https://i.ibb.co.com/hR56HGdP/Logo-Maranatha-Universitas-Kristen-Maranatha-Original-PNG.png" alt="Logo Maranatha">
           </div>
           <h4 class="fw-bold mb-1">E-Form Permintaan ATK Triwulan</h4>
-          <p class="mb-0 opacity-75 small">Sistem Pengajuan Multi-Item (Hosted by DSP)</p>
+          <p class="mb-0 opacity-75 small">Sistem Pengajuan Multi-Item (GitHub Hosted)</p>
         </div>
         
         <div class="form-section">
@@ -109,9 +111,10 @@
         </div>
       </div>
     </div>
+
     <script>
-      
-      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqY3E8sUH5iaG-CPA0AgHNdNMmhy2UmoW97BKp2WOOSQNXu5y7kafZPVEaYQ4-xaWC/exec";
+      // ⚠️ GANTI URL DI BAWAH INI DENGAN WEB APP URL DARI GOOGLE APPS SCRIPT ANDA
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyOY7wLOY5Nsf6i8Ob5kMEktnbFq8VnZ7jLNe4BRx726iAmTyNXtkGAXm59drtI2s3M/exec";
 
       var globalMaterials = [];
       var globalUnits = [];
@@ -122,7 +125,7 @@
         loadUnits();
       };
 
-    function loadMaterials() {
+      function loadMaterials() {
         fetch(WEB_APP_URL + "?action=getMaterial")
           .then(res => res.json())
           .then(list => {
@@ -130,17 +133,11 @@
             var select = document.getElementById("dropdownMaterial");
             var loader = document.getElementById("materialLoading");
             
-            select.innerHTML = '<option value="">-- Pilih Kode, Deskripsi & Harga --</option>';
+            select.innerHTML = '<option value="">-- Pilih Kode & Deskripsi --</option>';
             list.forEach(item => {
               var opt = document.createElement('option');
               opt.value = item.kode;
-              
-              // Memformat angka harga menjadi format ribuan (Rupiah)
-              var hargaFormatted = Number(item.harga || 0).toLocaleString("id-ID");
-              
-              // Menggabungkan Kode, Deskripsi, dan Harga
-              opt.innerHTML = item.kode + " - " + item.deskripsi + " (Rp " + hargaFormatted + ")";
-              
+              opt.innerHTML = item.kode + " - " + item.deskripsi;
               select.appendChild(opt);
             });
             loader.style.display = "none";
@@ -151,6 +148,7 @@
             console.error(err);
           });
       }
+
       function loadUnits() {
         fetch(WEB_APP_URL + "?action=getUnit")
           .then(res => res.json())
@@ -284,14 +282,13 @@
             div.innerHTML = `
               <div class="alert alert-success fw-bold">✅ Semua Permintaan Berhasil Terdistribusi Ke Sheet Masing-Masing Vendor!</div>
               <div class="card p-3 mt-2" style="border: 2px dashed #007bff; background-color: #f8f9fa;">
-                <p class="text-muted small mb-2 fw-semibold">Silakan unduh berkas rekap multi-tab per vendor di bawah ini:</p>
-                <button type="button" id="btnDownload" class="btn btn-primary fw-bold w-100 py-2" onclick="downloadMultiSheetExcel()">📥 Unduh Berkas Excel Multi-Tab (.xlsx)</button>
+                <p class="text-muted small mb-2 fw-semibold">Silakan unduh berkas rekap cetak pengajuan fisik Anda di bawah ini:</p>
+                <button type="button" class="btn btn-primary fw-bold w-100 py-2" onclick="unduhBerkasHasil('${res.excelData}', '${res.fileName}')">📥 Unduh Berkas Excel Gabungan (.xls)</button>
               </div>`;
             keranjangBarang = [];
             renderTabelKeranjang();
             document.getElementById("dropdownUnit").disabled = false;
-          }
-          else {
+          } else {
             div.innerHTML = '<div class="alert alert-danger fw-bold">❌ Gagal: ' + res.message + '</div>';
             btn.disabled = false;
           }
@@ -302,77 +299,19 @@
         });
       }
 
-    async function downloadMultiSheetExcel() {
-    var btn = document.getElementById("btnDownload");
-    if(btn) {
-        btn.disabled = true;
-        btn.innerText = "Menyiapkan Excel Khusus Unit Anda...";
-    }
-
-    // Ambil nama unit kerja yang sedang aktif dipilih di dropdown
-    var activeUnit = document.getElementById("dropdownUnit").value;
-    if (!activeUnit) {
-        alert("Pilih unit kerja terlebih dahulu!");
-        if(btn) btn.disabled = false;
-        return;
-    }
-
-    var vendorNames = ["CV BLUEPINDO JAYA", "SINTERA", "CV PELITA KASIH"];
-    var workbook = XLSX.utils.book_new();
-    var adaDataUnit = false;
-
-    try {
-        for (let i = 0; i < vendorNames.length; i++) {
-            let vendor = vendorNames[i];
-            if(btn) btn.innerText = "Memeriksa vendor: " + vendor + "...";
-
-            // Tarik data mentah per sheet vendor dari server Google Spreadsheet
-            let response = await fetch(WEB_APP_URL + "?action=getDataPerSheet&sheet=" + encodeURIComponent(vendor));
-            let data = await response.json();
-
-            if (data.status === "Sukses" && data.rows && data.rows.length > 0) {
-                let allRows = data.rows;
-                let header = allRows[0]; // Baris pertama adalah judul kolom (Header)
-                
-                let filteredRows = allRows.filter((row, index) => {
-                    if (index === 0) return true; // Selalu sertakan header
-                    
-                    // Ambil teks dari kolom Nama Unit (sesuaikan angka indeksnya jika perlu, misal row[1] atau row[2])
-                    let cellUnit = String(row[1] || "").trim().toLowerCase();
-                    let targetUnit = activeUnit.trim().toLowerCase();
-
-                    // Cocokkan apakah baris tersebut milik unit yang sedang aktif
-                    return cellUnit.includes(targetUnit) || targetUnit.includes(cellUnit);
-                });
-
-                // Jika ada data milik unit ini di vendor tersebut, masukkan ke tab Excel
-                if (filteredRows.length > 1) {
-                    adaDataUnit = true;
-                    var ws = XLSX.utils.aoa_to_sheet(filteredRows);
-                    var safeSheetName = vendor.substring(0, 31);
-                    XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
-                }
-            }
-        }
-
-        if (!adaDataUnit) {
-            alert("Belum ada riwayat pengajuan data untuk unit " + activeUnit + ".");
-        } else {
-            if(btn) btn.innerText = "Menyimpan file Excel...";
-            var namaFileClean = activeUnit.replace(/[^a-zA-Z0-9]/g, "_");
-            XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
-        }
-        
-    } catch (err) {
-        console.error(err);
-        alert("Gagal mengunduh file Excel. Periksa koneksi Anda.");
-    } finally {
-        if(btn) {
-            btn.disabled = false;
-            btn.innerText = "📥 Unduh Berkas Excel Per Unit (.xlsx)";
-        }
-    }
-}
+      function unduhBerkasHasil(base64, fileName) {
+        var byteCharacters = atob(base64);
+        var byteNumbers = new Array(byteCharacters.length);
+        for (var i = 0; i < byteCharacters.length; i++) { byteNumbers[i] = byteCharacters.charCodeAt(i); }
+        var byteArray = new Uint8Array(byteNumbers);
+        var blob = new Blob([byteArray], {type: "application/vnd.ms-excel"});
+        var link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
     </script>
   </body>
 </html>
