@@ -319,18 +319,17 @@
         var lokasiUnitVal = document.getElementById("lokasiUnit").value || "-";
         var workbook = XLSX.utils.book_new();
 
-        // Kelompokkan item berdasarkan vendornya masing-masing
         var groupedByVendor = {};
         itemsArray.forEach(item => {
             var v = item.vendorTarget || "Lainnya";
             if (!groupedByVendor[v]) {
                 groupedByVendor[v] = [];
                 
-                // Baris 1: Judul Utama Laporan (Gaya Header Biru di Excel)
+                // Baris Judul Utama
                 groupedByVendor[v].push(["BUKTI FISIK GABUNGAN PENGAJUAN PENGGUNAAN DANA ATK"]);
-                groupedByVendor[v].push([]); // Baris kosong untuk spasi
+                groupedByVendor[v].push([]); // Spasi kosong
 
-                // Baris 3: Header Kolom tabel sesuai gambar
+                // Baris Header Kolom sesuai gambar
                 groupedByVendor[v].push([
                     "NO", 
                     "KODE MATERIAL", 
@@ -346,16 +345,17 @@
                 ]);
             }
             
-            // Hitung Jumlah Harga (Jumlah x Harga)
             var qty = Number(item.jumlah) || 0;
             var prc = Number(item.hargaBarang) || 0;
             var subTotal = qty * prc;
-            var nomorUrut = groupedByVendor[v].length - 2; // Menghitung nomor urut otomatis
+            var nomorUrut = groupedByVendor[v].length - 2;
 
-            // Masukkan data baris item
+            // Tambahkan tanda petik satu di depan kode material agar formatnya persis
+            var kodeFormatted = "'" + item.kodeMaterial;
+
             groupedByVendor[v].push([
                 nomorUrut,
-                item.kodeMaterial,
+                kodeFormatted,
                 item.satuanBarang,
                 item.merkBarang,
                 item.deskripsiBarang,
@@ -368,24 +368,19 @@
             ]);
         });
 
-        // Tambahkan footer catatan tanggal cetak di setiap tab vendor
         var tglSekarang = new Date().toLocaleDateString("id-ID");
         var footerCatatan = [`* Berkas gabungan sah digunakan sebagai bukti fisik penggunaan anggaran unit kerja. Dicetak otomatis pada tanggal: ${tglSekarang}`];
 
-        // Buat Sheet/Tab terpisah untuk setiap vendor di file Excel
         for (var vendorName in groupedByVendor) {
             var rowsData = groupedByVendor[vendorName];
-            
-            // Tambahkan baris kosong dan catatan di bagian bawah tabel
             rowsData.push([]);
             rowsData.push(footerCatatan);
 
             var ws = XLSX.utils.aoa_to_sheet(rowsData);
-            var safeSheetName = vendorName.substring(0, 31); // Maksimal 31 karakter nama sheet Excel
+            var safeSheetName = vendorName.substring(0, 31);
             XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
         }
 
-        // Unduh file Excel (.xlsx) dengan nama sesuai unit yang mengajukan
         var namaFileClean = (namaUnit || "Rekap").replace(/[^a-zA-Z0-9]/g, "_");
         XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
 
