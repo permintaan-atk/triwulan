@@ -306,100 +306,118 @@
       }
 
       function downloadMultiSheetExcel(itemsArray, namaUnit) {
-        var btn = document.getElementById("btnDownload");
-        if(btn) {
-            btn.disabled = true;
-            btn.innerText = "Menyiapkan Excel per Unit...";
-        }
+    var btn = document.getElementById("btnDownload");
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "Menyiapkan Excel per Unit...";
+    }
 
-        if (!itemsArray || itemsArray.length === 0) {
-            alert("Data keranjang kosong.");
-            if(btn) btn.disabled = false;
-            return;
-        }
+    if (!itemsArray || itemsArray.length === 0) {
+        alert("Data keranjang kosong.");
+        if(btn) btn.disabled = false;
+        return;
+    }
 
-        var lokasiUnitVal = document.getElementById("lokasiUnit").value || "-";
-        var workbook = XLSX.utils.book_new();
+    var lokasiUnitVal = document.getElementById("lokasiUnit").value || "-";
+    var workbook = XLSX.utils.book_new();
 
-        var groupedByVendor = {};
-        itemsArray.forEach(item => {
-            var v = item.vendorTarget || "Lainnya";
-            if (!groupedByVendor[v]) {
-                groupedByVendor[v] = [];
-                
-                // Baris Judul Utama
-                groupedByVendor[v].push(["PENGAJUAN PENGGUNAAN DANA ATK"]);
-                groupedByVendor[v].push([]); // Spasi kosong
-
-                // Baris Header Kolom sesuai gambar
-                groupedByVendor[v].push([
-                    "NO", 
-                    "KODE MATERIAL", 
-                    "SATUAN PAKAI", 
-                    "MERK", 
-                    "KETERANGAN", 
-                    "HARGA", 
-                    "VENDOR", 
-                    "JUMLAH", 
-                    "JUMLAH HARGA", 
-                    "NAMA UNIT", 
-                    "LOKASI PENGIRIMAN BARANG"
-                ]);
-            }
+    var groupedByVendor = {};
+    itemsArray.forEach(item => {
+        var v = item.vendorTarget || "Lainnya";
+        if (!groupedByVendor[v]) {
+            groupedByVendor[v] = [];
             
-            var qty = Number(item.jumlah) || 0;
-            var prc = Number(item.hargaBarang) || 0;
-            var subTotal = qty * prc;
-            var nomorUrut = groupedByVendor[v].length - 2;
+            // Baris Judul Utama
+            groupedByVendor[v].push(["PENGAJUAN PENGGUNAAN DANA ATK"]);
+            groupedByVendor[v].push([]); // Spasi kosong
 
-            var kodeFormatted = "'" + item.kodeMaterial;
-
+            // Baris Header Kolom
             groupedByVendor[v].push([
-                nomorUrut,
-                kodeFormatted,
-                item.satuanBarang,
-                item.merkBarang,
-                item.deskripsiBarang,
-                prc,
-                item.vendorTarget,
-                qty,
-                subTotal,
-                namaUnit || "Unit Kerja",
-                lokasiUnitVal
+                "NO", 
+                "KODE MATERIAL", 
+                "SATUAN PAKAI", 
+                "MERK", 
+                "KETERANGAN", 
+                "HARGA", 
+                "VENDOR", 
+                "JUMLAH", 
+                "JUMLAH HARGA", 
+                "NAMA UNIT", 
+                "LOKASI PENGIRIMAN BARANG"
             ]);
-        });
+        }
+        
+        var qty = Number(item.jumlah) || 0;
+        var prc = Number(item.hargaBarang) || 0;
+        var subTotal = qty * prc;
+        
+        // Memperbaiki nomor urut agar mulai dari angka 1 secara tepat
+        var nomorUrut = groupedByVendor[v].length - 2; 
 
-        var tglSekarang = new Date().toLocaleDateString("id-ID");
-        var footerCatatan = [`* Berkas gabungan sah digunakan sebagai bukti fisik penggunaan anggaran unit kerja. Dicetak otomatis pada tanggal: ${tglSekarang}`];
+        var kodeFormatted = "'" + item.kodeMaterial;
 
-        for (var vendorName in groupedByVendor) {
-            var rowsData = groupedByVendor[vendorName];
-            rowsData.push([]);
-            rowsData.push(footerCatatan);
+        groupedByVendor[v].push([
+            nomorUrut,
+            kodeFormatted,
+            item.satuanBarang,
+            item.merkBarang,
+            item.deskripsiBarang,
+            prc,
+            item.vendorTarget,
+            qty,
+            subTotal,
+            namaUnit || "Unit Kerja",
+            lokasiUnitVal
+        ]);
+    });
 
-            var ws = XLSX.utils.aoa_to_sheet(rowsData);
+    var tglSekarang = new Date().toLocaleDateString("id-ID");
+    var footerCatatan = [`* Berkas gabungan sah digunakan sebagai bukti fisik penggunaan anggaran unit kerja. Dicetak otomatis pada tanggal: ${tglSekarang}`];
 
-            // Pengaturan wajib agar garis kotak-kotak pembatas (gridlines) muncul di Excel
-            ws['!views'] = [{ showGridLines: true }];
-            
-            // Memastikan rentang sel (range) terbaca penuh oleh Excel agar garis grid terpampang
-            if (ws['!ref']) {
-                var range = XLSX.utils.decode_range(ws['!ref']);
-                ws['!ref'] = XLSX.utils.encode_range(range);
+    for (var vendorName in groupedByVendor) {
+        var rowsData = groupedByVendor[vendorName];
+        rowsData.push([]);
+        rowsData.push(footerCatatan);
+
+        var ws = XLSX.utils.aoa_to_sheet(rowsData);
+
+        // ============================================================
+        // PERBAIKAN UTAMA: FORCE GRIDLINES & COMPATIBILITY LAYER
+        // ============================================================
+        
+        // 1. Definisikan views secara spesifik dengan Workbook View State
+        ws['!views'] = [
+            {
+                showGridLines: true,
+                workbookViewId: 0,
+                zoomScale: 100,
+                zoomScaleNormal: 100
             }
+        ];
 
-            var safeSheetName = vendorName.substring(0, 31);
-            XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
+        // 2. Tambahkan pengaturan lembar kerja tambahan untuk memaksa render garis borders di beberapa versi Excel
+        ws['!margins'] = { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
+
+        // 3. Dekode ulang rentang sel (range) secara presisi demi memastikan seluruh koordinat sel terikat aturan grid
+        if (ws['!ref']) {
+            var range = XLSX.utils.decode_range(ws['!ref']);
+            ws['!ref'] = XLSX.utils.encode_range(range);
         }
+        // ============================================================
 
-        var namaFileClean = (namaUnit || "Rekap").replace(/[^a-zA-Z0-9]/g, "_");
-        XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
+        var safeSheetName = vendorName.substring(0, 31);
+        XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
+    }
 
-        if(btn) {
-            btn.disabled = false;
-            btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
-        }
-      }    
+    var namaFileClean = (namaUnit || "Rekap").replace(/[^a-zA-Z0-9]/g, "_");
+    XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
+
+    if(btn) {
+        btn.disabled = false;
+        btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+    }
+}
+
       
     </script>
   </body>
