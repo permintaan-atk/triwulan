@@ -4,21 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>E-Form Permintaan ATK Triwulan</title>
-    <!-- Bootstrap 5 -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- PWA Manifest untuk Install Aplikasi -->
-    <link rel="manifest" href="manifest.json">
+
     <meta name="theme-color" content="#0056b3">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
-      body { 
-        background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%); 
+      body {
+        background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
         font-family: 'Plus Jakarta Sans', sans-serif;
         min-height: 100vh;
         display: flex;
@@ -26,48 +25,149 @@
         justify-content: center;
         padding: 2rem 1rem;
       }
-      .main-container { width: 100%; max-width: 750px; margin: 0 auto; }
-      .card-form { border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0, 56, 179, 0.04); background: #ffffff; overflow: hidden; width: 100%; }
-      .brand-header { background: linear-gradient(135deg, #0056b3 0%, #003d82 100%); padding: 1.5rem; text-align: center; color: white; }
-      .logo-container { width: 75px; height: 75px; background-color: #ffffff; border-radius: 50%; margin: 0 auto 0.8rem auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 6px; }
-      .logo-container img { width: 100%; height: 100%; object-fit: contain; }
-      .form-section { padding: 2.5rem; }
-      .inner-card { border-radius: 15px; border: 1px solid #eef2f7; background-color: #fafdff; padding: 1.5rem; }
-      .form-label { font-weight: 600; color: #4a5568; font-size: 0.9rem; }
-      .form-control, .form-select { border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 0.6rem 1rem; font-size: 0.95rem; }
-      .btn-add { background: #17a2b8; border: none; color: white; border-radius: 10px; font-weight: 600; padding: 0.7rem; }
-      .btn-add:hover { background: #138496; color: white; }
-      .btn-submit { background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); border: none; border-radius: 12px; }
-      .loading-overlay { font-size: 0.85rem; font-weight: 500; color: #64748b; }
-      .spinner-custom { width: 1.2rem; height: 1.2rem; border-width: 0.18em; }
+
+      .main-container {
+        width: 100%;
+        max-width: 750px;
+        margin: 0 auto;
+      }
+
+      .card-form {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0, 56, 179, 0.04);
+        background: #ffffff;
+        overflow: hidden;
+        width: 100%;
+      }
+
+      .brand-header {
+        background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+        padding: 1.5rem;
+        text-align: center;
+        color: white;
+      }
+
+      .logo-container {
+        width: 75px;
+        height: 75px;
+        background-color: #ffffff;
+        border-radius: 50%;
+        margin: 0 auto 0.8rem auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 6px;
+      }
+
+      .logo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .form-section {
+        padding: 2.5rem;
+      }
+
+      .inner-card {
+        border-radius: 15px;
+        border: 1px solid #eef2f7;
+        background-color: #fafdff;
+        padding: 1.5rem;
+      }
+
+      .form-label {
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+      }
+
+      .form-control,
+      .form-select {
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+      }
+
+      .btn-add {
+        background: #17a2b8;
+        border: none;
+        color: white;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 0.7rem;
+      }
+
+      .btn-add:hover {
+        background: #138496;
+        color: white;
+      }
+
+      .btn-submit {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        border: none;
+        border-radius: 12px;
+      }
+
+      .loading-overlay {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+      }
+
+      .spinner-custom {
+        width: 1.2rem;
+        height: 1.2rem;
+        border-width: 0.18em;
+      }
     </style>
   </head>
+
   <body>
     <div class="main-container">
       <div class="card card-form">
         <div class="brand-header">
           <div class="logo-container">
-            <img src="https://i.ibb.co.com/hR56HGdP/Logo-Maranatha-Universitas-Kristen-Maranatha-Original-PNG.png" alt="Logo Maranatha">
+            <img
+              src="https://i.ibb.co.com/hR56HGdP/Logo-Maranatha-Universitas-Kristen-Maranatha-Original-PNG.png"
+              alt="Logo Maranatha"
+            >
           </div>
           <h4 class="fw-bold mb-1">E-Form Permintaan ATK Triwulan</h4>
           <p class="mb-0 opacity-75 small">Sistem Pengajuan Multi-Item (GitHub Hosted)</p>
         </div>
-        
+
         <div class="form-section">
           <form id="atkForm">
             <div class="mb-4">
               <label class="form-label mb-2">🏢 Nama Unit Kerja / Direktorat Anda</label>
+
               <div id="unitLoading" class="loading-overlay mb-2">
-                <div class="spinner-border spinner-custom text-primary me-2" role="status"></div> Memuat daftar unit kerja...
+                <div class="spinner-border spinner-custom text-primary me-2" role="status"></div>
+                Memuat daftar unit kerja...
               </div>
-              <select id="dropdownUnit" class="form-select shadow-sm" onchange="updateUnitMeta()" style="display:none;" required>
+
+              <select
+                id="dropdownUnit"
+                class="form-select shadow-sm"
+                style="display: none;"
+                required
+              >
                 <option value="">-- Pilih Unit Kerja Anda --</option>
               </select>
+
               <input type="hidden" id="lokasiUnit">
             </div>
 
             <div class="inner-card mb-4">
-              <h6 class="fw-bold text-dark mb-3"><span class="badge bg-primary me-2">Step 2</span> Tambah Item Barang ke Keranjang</h6>
+              <h6 class="fw-bold text-dark mb-3">
+                <span class="badge bg-primary me-2">Step 2</span>
+                Tambah Item Barang ke Keranjang
+              </h6>
+
               <input type="hidden" id="vendorTarget">
               <input type="hidden" id="deskripsiBarang">
               <input type="hidden" id="satuanBarang">
@@ -76,37 +176,68 @@
 
               <div class="mb-3">
                 <label class="form-label small mb-1">📦 Pilih Barang / Material</label>
+
                 <div id="materialLoading" class="loading-overlay mb-2">
-                  <div class="spinner-border spinner-custom text-primary me-2" role="status"></div> Memuat database material barang...
+                  <div class="spinner-border spinner-custom text-primary me-2" role="status"></div>
+                  Memuat database material barang...
                 </div>
-                <select id="dropdownMaterial" class="form-select shadow-sm" onchange="updateMaterialMeta()" style="display:none;">
+
+                <select
+                  id="dropdownMaterial"
+                  class="form-select shadow-sm"
+                  style="display: none;"
+                >
                   <option value="">-- Pilih Kode & Deskripsi --</option>
                 </select>
+
                 <div id="vendorBadge" class="form-text text-primary fw-bold mt-2" style="font-size: 0.85rem;"></div>
               </div>
 
               <div class="mb-3">
                 <label class="form-label small mb-1">🔢 Jumlah Permintaan</label>
-                <input type="number" id="jumlah" class="form-control shadow-sm" min="1" placeholder="Masukkan jumlah angka">
+                <input
+                  type="number"
+                  id="jumlah"
+                  class="form-control shadow-sm"
+                  min="1"
+                  step="1"
+                  placeholder="Masukkan jumlah angka"
+                >
               </div>
 
-              <button type="button" onclick="tambahKeDaftar()" class="btn btn-add w-100 fw-bold shadow-sm mt-2">➕ Masukkan ke Keranjang</button>
+              <button type="button" id="btnAdd" class="btn btn-add w-100 fw-bold shadow-sm mt-2">
+                ➕ Masukkan ke Keranjang
+              </button>
             </div>
           </form>
 
-          <div id="tabelKeranjangArea" class="card p-3 border-0 bg-light" style="display:none; border-radius:15px;">
+          <div id="tabelKeranjangArea" class="card p-3 border-0 bg-light" style="display: none; border-radius: 15px;">
             <h6 class="fw-bold text-dark mb-3">🛒 Daftar Keranjang Pengajuan Anda:</h6>
+
             <div class="table-responsive rounded-3 overflow-hidden shadow-sm bg-white">
               <table class="table table-hover table-striped align-middle mb-0 small">
                 <thead class="table-dark">
-                  <tr><th class="ps-3">Kode</th><th>Nama Barang</th><th>Vendor</th><th class="text-center">Jumlah</th><th class="text-center pe-3">Aksi</th></tr>
+                  <tr>
+                    <th class="ps-3">Kode</th>
+                    <th>Nama Barang</th>
+                    <th>Vendor</th>
+                    <th class="text-center">Jumlah</th>
+                    <th class="text-center pe-3">Aksi</th>
+                  </tr>
                 </thead>
                 <tbody id="bodyKeranjang"></tbody>
               </table>
             </div>
-            <button type="button" id="btnSubmit" onclick="kirimSemuaData()" class="btn btn-submit text-white w-100 fw-bold py-2.5 mt-3 shadow">🚀 Kirim Pengajuan & Unduh Berkas Gabungan (.XLS)</button>
+
+            <button
+              type="button"
+              id="btnSubmit"
+              class="btn btn-submit text-white w-100 fw-bold py-2 mt-3 shadow"
+            >
+              🚀 Kirim Pengajuan & Unduh Berkas Gabungan (.XLS)
+            </button>
           </div>
-          
+
           <div id="output" class="text-center mt-3"></div>
         </div>
       </div>
@@ -115,310 +246,470 @@
     <script>
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqY3E8sUH5iaG-CPA0AgHNdNMmhy2UmoW97BKp2WOOSQNXu5y7kafZPVEaYQ4-xaWC/exec";
 
-      var globalMaterials = [];
-      var globalUnits = [];
-      var keranjangBarang = [];
+      let globalMaterials = [];
+      let globalUnits = [];
+      let keranjangBarang = [];
 
-      window.onload = function() {
+      window.addEventListener("load", () => {
+        document.getElementById("btnAdd").addEventListener("click", tambahKeDaftar);
+        document.getElementById("btnSubmit").addEventListener("click", kirimSemuaData);
+        document.getElementById("dropdownMaterial").addEventListener("change", updateMaterialMeta);
+        document.getElementById("dropdownUnit").addEventListener("change", updateUnitMeta);
+
         loadMaterials();
         loadUnits();
-      };
+      });
 
-      function loadMaterials() {
-        fetch(WEB_APP_URL + "?action=getMaterial")
-          .then(res => res.json())
-          .then(list => {
-            globalMaterials = list;
-            var select = document.getElementById("dropdownMaterial");
-            var loader = document.getElementById("materialLoading");
-            
-            select.innerHTML = '<option value="">-- Pilih Kode & Deskripsi --</option>';
-            list.forEach(item => {
-              var opt = document.createElement('option');
-              opt.value = item.kode;
-              // Menambahkan kembali informasi Harga dan Vendor pada teks pilihan dropdown
-              var formatHarga = Number(item.harga || 0).toLocaleString('id-ID');
-              opt.innerHTML = item.kode + " - " + item.deskripsi + " (Rp " + formatHarga + ")";
-              select.appendChild(opt);
-            });
-            loader.style.display = "none";
-            select.style.display = "block";
-          })
-          .catch(err => {
-            document.getElementById("materialLoading").innerHTML = "❌ Gagal memuat material.";
-            console.error(err);
-          });
+      async function fetchJson(url, options = {}) {
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+          throw new Error("HTTP error " + response.status);
+        }
+
+        return response.json();
       }
 
-      function loadUnits() {
-        fetch(WEB_APP_URL + "?action=getUnit")
-          .then(res => res.json())
-          .then(list => {
-            globalUnits = list;
-            var select = document.getElementById("dropdownUnit");
-            var loader = document.getElementById("unitLoading");
-            
-            select.innerHTML = '<option value="">-- Pilih Unit Kerja Anda --</option>';
-            list.forEach(item => {
-              var opt = document.createElement('option');
-              opt.value = item.namaUnit;
-              opt.innerHTML = item.namaUnit;
-              select.appendChild(opt);
-            });
-            loader.style.display = "none";
-            select.style.display = "block";
-          })
-          .catch(err => {
-            document.getElementById("unitLoading").innerHTML = "❌ Gagal memuat unit.";
-            console.error(err);
-          });
+      function setText(elementId, value) {
+        document.getElementById(elementId).textContent = value == null ? "" : String(value);
       }
 
-      function updateMaterialMeta() {
-        var val = document.getElementById("dropdownMaterial").value;
-        var item = globalMaterials.find(i => i.kode === val);
-        if (item) {
-          document.getElementById("vendorTarget").value = item.vendor;
-          document.getElementById("deskripsiBarang").value = item.deskripsi;
-          document.getElementById("satuanBarang").value = item.satuan;
-          document.getElementById("merkBarang").value = item.merk;
-          document.getElementById("hargaBarang").value = item.harga;
-          document.getElementById("vendorBadge").innerHTML = "🏢 Vendor: " + item.vendor + " | 💰 Harga: Rp " + item.harga.toLocaleString('id-ID');
-        } else {
-          document.getElementById("vendorBadge").innerHTML = "";
+      async function loadMaterials() {
+        const loader = document.getElementById("materialLoading");
+        const select = document.getElementById("dropdownMaterial");
+
+        try {
+          const list = await fetchJson(WEB_APP_URL + "?action=getMaterial");
+
+          if (!Array.isArray(list)) {
+            throw new Error("Format data material tidak valid.");
+          }
+
+          globalMaterials = list;
+          select.replaceChildren();
+
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.textContent = "-- Pilih Kode & Deskripsi --";
+          select.appendChild(defaultOption);
+
+          list.forEach(item => {
+            const option = document.createElement("option");
+            const kode = item.kode == null ? "" : String(item.kode);
+            const deskripsi = item.deskripsi == null ? "" : String(item.deskripsi);
+            const harga = Number(item.harga) || 0;
+
+            option.value = kode;
+            option.textContent = `${kode} - ${deskripsi} (Rp ${harga.toLocaleString("id-ID")})`;
+            select.appendChild(option);
+          });
+
+          loader.style.display = "none";
+          select.style.display = "block";
+        } catch (error) {
+          loader.textContent = "❌ Gagal memuat material.";
+          console.error(error);
         }
       }
 
+      async function loadUnits() {
+        const loader = document.getElementById("unitLoading");
+        const select = document.getElementById("dropdownUnit");
+
+        try {
+          const list = await fetchJson(WEB_APP_URL + "?action=getUnit");
+
+          if (!Array.isArray(list)) {
+            throw new Error("Format data unit tidak valid.");
+          }
+
+          globalUnits = list;
+          select.replaceChildren();
+
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.textContent = "-- Pilih Unit Kerja Anda --";
+          select.appendChild(defaultOption);
+
+          list.forEach(item => {
+            const namaUnit = item.namaUnit == null ? "" : String(item.namaUnit);
+            const option = document.createElement("option");
+
+            option.value = namaUnit;
+            option.textContent = namaUnit;
+            select.appendChild(option);
+          });
+
+          loader.style.display = "none";
+          select.style.display = "block";
+        } catch (error) {
+          loader.textContent = "❌ Gagal memuat unit.";
+          console.error(error);
+        }
+      }
+
+      function updateMaterialMeta() {
+        const value = document.getElementById("dropdownMaterial").value;
+
+        const item = globalMaterials.find(
+          material => String(material.kode) === String(value)
+        );
+
+        if (!item) {
+          document.getElementById("vendorTarget").value = "";
+          document.getElementById("deskripsiBarang").value = "";
+          document.getElementById("satuanBarang").value = "";
+          document.getElementById("merkBarang").value = "";
+          document.getElementById("hargaBarang").value = "";
+          setText("vendorBadge", "");
+          return;
+        }
+
+        const harga = Number(item.harga) || 0;
+
+        document.getElementById("vendorTarget").value = item.vendor ?? "";
+        document.getElementById("deskripsiBarang").value = item.deskripsi ?? "";
+        document.getElementById("satuanBarang").value = item.satuan ?? "";
+        document.getElementById("merkBarang").value = item.merk ?? "";
+        document.getElementById("hargaBarang").value = harga;
+
+        setText(
+          "vendorBadge",
+          `🏢 Vendor: ${item.vendor ?? "-"} | 💰 Harga: Rp ${harga.toLocaleString("id-ID")}`
+        );
+      }
+
       function updateUnitMeta() {
-        var val = document.getElementById("dropdownUnit").value;
-        var item = globalUnits.find(i => i.namaUnit === val);
-        if (item) { document.getElementById("lokasiUnit").value = item.lokasi; }
+        const value = document.getElementById("dropdownUnit").value;
+
+        const item = globalUnits.find(
+          unit => String(unit.namaUnit) === String(value)
+        );
+
+        document.getElementById("lokasiUnit").value = item?.lokasi ?? "";
       }
 
       function tambahKeDaftar() {
-        var unitSelect = document.getElementById("dropdownUnit");
-        if(!unitSelect.value) {
+        const unitSelect = document.getElementById("dropdownUnit");
+        const materialSelect = document.getElementById("dropdownMaterial");
+        const quantityInput = document.getElementById("jumlah");
+
+        if (!unitSelect.value) {
           alert("Silakan pilih Nama Unit Anda terlebih dahulu!");
           unitSelect.focus();
           return;
         }
 
-        var kode = document.getElementById("dropdownMaterial").value;
-        var jml = document.getElementById("jumlah").value;
+        const kode = materialSelect.value;
+        const jumlah = Number(quantityInput.value);
 
-        if(!kode || !jml || jml < 1) {
-          alert("Silakan pilih barang dan masukkan jumlah permintaan yang valid!");
+        if (!kode) {
+          alert("Silakan pilih barang terlebih dahulu!");
+          materialSelect.focus();
+          return;
+        }
+
+        if (!Number.isInteger(jumlah) || jumlah < 1) {
+          alert("Jumlah harus berupa bilangan bulat minimal 1.");
+          quantityInput.focus();
+          return;
+        }
+
+        const item = globalMaterials.find(
+          material => String(material.kode) === String(kode)
+        );
+
+        if (!item) {
+          alert("Data material tidak ditemukan.");
           return;
         }
 
         keranjangBarang.push({
-          kodeMaterial: kode,
-          jumlah: jml,
-          vendorTarget: document.getElementById("vendorTarget").value,
-          deskripsiBarang: document.getElementById("deskripsiBarang").value,
-          satuanBarang: document.getElementById("satuanBarang").value,
-          merkBarang: document.getElementById("merkBarang").value,
-          hargaBarang: document.getElementById("hargaBarang").value
+          kodeMaterial: String(kode),
+          jumlah,
+          vendorTarget: item.vendor ?? "",
+          deskripsiBarang: item.deskripsi ?? "",
+          satuanBarang: item.satuan ?? "",
+          merkBarang: item.merk ?? "",
+          hargaBarang: Number(item.harga) || 0
         });
 
         unitSelect.disabled = true;
-        document.getElementById("dropdownMaterial").value = "";
-        document.getElementById("jumlah").value = "";
-        document.getElementById("vendorBadge").innerHTML = "";
+        materialSelect.value = "";
+        quantityInput.value = "";
+        setText("vendorBadge", "");
+        updateMaterialMeta();
         renderTabelKeranjang();
       }
 
       function renderTabelKeranjang() {
-        var tbody = document.getElementById("bodyKeranjang");
-        var area = document.getElementById("tabelKeranjangArea");
-        tbody.innerHTML = "";
+        const tbody = document.getElementById("bodyKeranjang");
+        const area = document.getElementById("tabelKeranjangArea");
+        const unitSelect = document.getElementById("dropdownUnit");
+        const submitButton = document.getElementById("btnSubmit");
 
-        if(keranjangBarang.length === 0) {
+        tbody.replaceChildren();
+
+        if (keranjangBarang.length === 0) {
           area.style.display = "none";
-          document.getElementById("dropdownUnit").disabled = false;
+          unitSelect.disabled = false;
+          submitButton.disabled = false;
           return;
         }
 
         area.style.display = "block";
+
         keranjangBarang.forEach((item, index) => {
-          var tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${item.kodeMaterial}</td>
-            <td>${item.deskripsiBarang}</td>
-            <td><span class="badge bg-primary">${item.vendorTarget}</span></td>
-            <td class="text-center fw-bold">${item.jumlah}</td>
-            <td><button type="button" class="btn btn-danger btn-sm py-0" onclick="hapusItemKeranjang(${index})">Hapus</button></td>
-          `;
-          tbody.appendChild(tr);
+          const row = document.createElement("tr");
+
+          const kodeCell = document.createElement("td");
+          kodeCell.className = "ps-3";
+          kodeCell.textContent = item.kodeMaterial;
+
+          const descriptionCell = document.createElement("td");
+          descriptionCell.textContent = item.deskripsiBarang;
+
+          const vendorCell = document.createElement("td");
+          const vendorBadge = document.createElement("span");
+          vendorBadge.className = "badge bg-primary";
+          vendorBadge.textContent = item.vendorTarget || "-";
+          vendorCell.appendChild(vendorBadge);
+
+          const quantityCell = document.createElement("td");
+          quantityCell.className = "text-center fw-bold";
+          quantityCell.textContent = item.jumlah;
+
+          const actionCell = document.createElement("td");
+          actionCell.className = "text-center pe-3";
+
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.className = "btn btn-danger btn-sm py-0";
+          deleteButton.textContent = "Hapus";
+          deleteButton.addEventListener("click", () => hapusItemKeranjang(index));
+
+          actionCell.appendChild(deleteButton);
+          row.append(kodeCell, descriptionCell, vendorCell, quantityCell, actionCell);
+          tbody.appendChild(row);
         });
       }
 
       function hapusItemKeranjang(index) {
+        if (index < 0 || index >= keranjangBarang.length) return;
+
         keranjangBarang.splice(index, 1);
         renderTabelKeranjang();
       }
 
-      function kirimSemuaData() {
-        var btn = document.getElementById("btnSubmit");
-        var div = document.getElementById("output");
+      async function kirimSemuaData() {
+        const button = document.getElementById("btnSubmit");
+        const output = document.getElementById("output");
 
-        if(keranjangBarang.length === 0) return;
+        if (keranjangBarang.length === 0) {
+          alert("Keranjang masih kosong.");
+          return;
+        }
 
-       btn.disabled = false;
-        div.innerHTML = '<div class="alert alert-warning fw-bold">Sedang mendistribusikan data ke masing-masing vendor & menyusun berkas Excel...</div>';
-        
-        var finalPayload = {
+        button.disabled = true;
+        output.textContent = "";
+
+        const loadingMessage = document.createElement("div");
+        loadingMessage.className = "alert alert-warning fw-bold";
+        loadingMessage.textContent = "Sedang mendistribusikan data ke masing-masing vendor & menyusun berkas Excel...";
+        output.appendChild(loadingMessage);
+
+        const finalPayload = {
           namaUnit: document.getElementById("dropdownUnit").value,
           lokasiUnit: document.getElementById("lokasiUnit").value,
           items: keranjangBarang
         };
 
-        fetch(WEB_APP_URL, {
-          method: "POST",
-          body: JSON.stringify(finalPayload)
-        })
-        .then(res => res.json())
-        .then(res => {
-          if (res && res.status === "Sukses") {
-            let dataBerhasilDiKirim = [...keranjangBarang];
-            let namaUnitAktif = document.getElementById("dropdownUnit").value;
+        try {
+          const response = await fetchJson(WEB_APP_URL, {
+            method: "POST",
+            body: JSON.stringify(finalPayload)
+          });
 
-            div.innerHTML = `
-              <div class="alert alert-success fw-bold">✅ Semua Permintaan Berhasil Terdistribusi Ke Sheet Masing-Masing Vendor!</div>
-              <div class="card p-3 mt-2" style="border: 2px dashed #007bff; background-color: #f8f9fa;">
-                <p class="text-muted small mb-2 fw-semibold">Silakan unduh berkas rekap multi-tab khusus unit Anda di bawah ini:</p>
-                <button type="button" id="btnDownload" class="btn btn-primary fw-bold w-100 py-2" onclick='downloadMultiSheetExcel(${JSON.stringify(dataBerhasilDiKirim)}, "${namaUnitAktif}")'>📥 Unduh Berkas Excel Multi-Tab (.xlsx)</button>
-              </div>`;
-            
-            keranjangBarang = [];
-            renderTabelKeranjang();
-            document.getElementById("dropdownUnit").disabled = false;
-          } else {
-            var pesanError = (res && res.message) ? res.message : "Terjadi kesalahan pada server.";
-            div.innerHTML = '<div class="alert alert-danger fw-bold">❌ Gagal: ' + pesanError + '</div>';
-            btn.disabled = false;
+          if (!response || response.status !== "Sukses") {
+            throw new Error(response?.message || "Terjadi kesalahan pada server.");
           }
-        })
-        .catch(err => {
-          div.innerHTML = '<div class="alert alert-danger fw-bold">❌ Terjadi kesalahan jaringan.</div>';
-          btn.disabled = false;
-        });
+
+          const submittedItems = keranjangBarang.map(item => ({ ...item }));
+          const activeUnit = document.getElementById("dropdownUnit").value;
+
+          output.replaceChildren();
+
+          const successMessage = document.createElement("div");
+          successMessage.className = "alert alert-success fw-bold";
+          successMessage.textContent = "✅ Semua Permintaan Berhasil Terdistribusi Ke Sheet Masing-Masing Vendor!";
+
+          const downloadCard = document.createElement("div");
+          downloadCard.className = "card p-3 mt-2";
+          downloadCard.style.border = "2px dashed #007bff";
+          downloadCard.style.backgroundColor = "#f8f9fa";
+
+          const description = document.createElement("p");
+          description.className = "text-muted small mb-2 fw-semibold";
+          description.textContent = "Silakan unduh berkas rekap multi-tab khusus unit Anda di bawah ini:";
+
+          const downloadButton = document.createElement("button");
+          downloadButton.type = "button";
+          downloadButton.id = "btnDownload";
+          downloadButton.className = "btn btn-primary fw-bold w-100 py-2";
+          downloadButton.textContent = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+          downloadButton.addEventListener("click", () => {
+            downloadMultiSheetExcel(submittedItems, activeUnit);
+          });
+
+          downloadCard.append(description, downloadButton);
+          output.append(successMessage, downloadCard);
+
+          keranjangBarang = [];
+          renderTabelKeranjang();
+        } catch (error) {
+          output.replaceChildren();
+
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "alert alert-danger fw-bold";
+          errorMessage.textContent = "❌ Gagal: " + error.message;
+          output.appendChild(errorMessage);
+
+          button.disabled = false;
+          console.error(error);
+        }
+      }
+
+      function createSafeSheetName(name, usedNames) {
+        let baseName = String(name || "Lainnya")
+          .replace(/[:\\/?*\[\]]/g, "-")
+          .replace(/^'+|'+$/g, "")
+          .trim()
+          .substring(0, 31);
+
+        if (!baseName) baseName = "Lainnya";
+
+        let sheetName = baseName;
+        let counter = 1;
+
+        while (usedNames.has(sheetName)) {
+          const suffix = ` (${counter})`;
+          sheetName = baseName.substring(0, 31 - suffix.length) + suffix;
+          counter++;
+        }
+
+        usedNames.add(sheetName);
+        return sheetName;
       }
 
       function downloadMultiSheetExcel(itemsArray, namaUnit) {
-    var btn = document.getElementById("btnDownload");
-    if(btn) {
-        btn.disabled = true;
-        btn.innerText = "Menyiapkan Excel per Unit...";
-    }
+        const button = document.getElementById("btnDownload");
 
-    if (!itemsArray || itemsArray.length === 0) {
-        alert("Data keranjang kosong.");
-        if(btn) btn.disabled = false;
-        return;
-    }
+        if (button) {
+          button.disabled = true;
+          button.textContent = "Menyiapkan Excel per Unit...";
+        }
 
-    var lokasiUnitVal = document.getElementById("lokasiUnit").value || "-";
-    var workbook = XLSX.utils.book_new();
+        if (!Array.isArray(itemsArray) || itemsArray.length === 0) {
+          alert("Data keranjang kosong.");
 
-    var groupedByVendor = {};
-    itemsArray.forEach(item => {
-        var v = item.vendorTarget || "Lainnya";
-        if (!groupedByVendor[v]) {
-            groupedByVendor[v] = [];
-            
-            // Baris Judul Utama
-            groupedByVendor[v].push(["PENGAJUAN PENGGUNAAN DANA ATK"]);
-            groupedByVendor[v].push([]); // Spasi kosong
+          if (button) {
+            button.disabled = false;
+            button.textContent = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+          }
 
-            // Baris Header Kolom
-            groupedByVendor[v].push([
-                "NO", 
-                "KODE MATERIAL", 
-                "SATUAN PAKAI", 
-                "MERK", 
-                "KETERANGAN", 
-                "HARGA", 
-                "VENDOR", 
-                "JUMLAH", 
-                "JUMLAH HARGA", 
-                "NAMA UNIT", 
+          return;
+        }
+
+        const lokasiUnit = document.getElementById("lokasiUnit").value || "-";
+        const workbook = XLSX.utils.book_new();
+        const groupedByVendor = {};
+
+        itemsArray.forEach(item => {
+          const vendor = String(item.vendorTarget || "Lainnya");
+
+          if (!groupedByVendor[vendor]) {
+            groupedByVendor[vendor] = [
+              ["PENGAJUAN PENGGUNAAN DANA ATK"],
+              [],
+              [
+                "NO",
+                "KODE MATERIAL",
+                "SATUAN PAKAI",
+                "MERK",
+                "KETERANGAN",
+                "HARGA",
+                "VENDOR",
+                "JUMLAH",
+                "JUMLAH HARGA",
+                "NAMA UNIT",
                 "LOKASI PENGIRIMAN BARANG"
-            ]);
-        }
-        
-        var qty = Number(item.jumlah) || 0;
-        var prc = Number(item.hargaBarang) || 0;
-        var subTotal = qty * prc;
-        
-        // Memperbaiki nomor urut agar mulai dari angka 1 secara tepat
-        var nomorUrut = groupedByVendor[v].length - 2; 
+              ]
+            ];
+          }
 
-        var kodeFormatted = "'" + item.kodeMaterial;
+          const quantity = Number(item.jumlah) || 0;
+          const price = Number(item.hargaBarang) || 0;
+          const subtotal = quantity * price;
+          const rowNumber = groupedByVendor[vendor].length - 2;
 
-        groupedByVendor[v].push([
-            nomorUrut,
-            kodeFormatted,
-            item.satuanBarang,
-            item.merkBarang,
-            item.deskripsiBarang,
-            prc,
-            item.vendorTarget,
-            qty,
-            subTotal,
+          groupedByVendor[vendor].push([
+            rowNumber,
+            "'" + String(item.kodeMaterial || ""),
+            item.satuanBarang || "",
+            item.merkBarang || "",
+            item.deskripsiBarang || "",
+            price,
+            vendor,
+            quantity,
+            subtotal,
             namaUnit || "Unit Kerja",
-            lokasiUnitVal
-        ]);
-    });
+            lokasiUnit
+          ]);
+        });
 
-    var tglSekarang = new Date().toLocaleDateString("id-ID");
-    var footerCatatan = [`* Berkas gabungan sah digunakan sebagai bukti fisik penggunaan anggaran unit kerja. Dicetak otomatis pada tanggal: ${tglSekarang}`];
+        const currentDate = new Date().toLocaleDateString("id-ID");
+        const usedSheetNames = new Set();
 
-    for (var vendorName in groupedByVendor) {
-        var rowsData = groupedByVendor[vendorName];
-        rowsData.push([]);
-        rowsData.push(footerCatatan);
+        Object.keys(groupedByVendor).forEach(vendor => {
+          const rows = groupedByVendor[vendor];
 
-        var ws = XLSX.utils.aoa_to_sheet(rowsData);
+          rows.push([]);
+          rows.push([
+            `* Berkas gabungan sah digunakan sebagai bukti fisik penggunaan anggaran unit kerja. Dicetak otomatis pada tanggal: ${currentDate}`
+          ]);
 
-        // ============================================================
-        // PERBAIKAN UTAMA: FORCE GRIDLINES & COMPATIBILITY LAYER
-        // ============================================================
-        
-        // 1. Definisikan views secara spesifik dengan Workbook View State
-        ws['!views'] = [
-            {
-                showGridLines: true,
-                workbookViewId: 0,
-                zoomScale: 100,
-                zoomScaleNormal: 100
-            }
-        ];
+          const worksheet = XLSX.utils.aoa_to_sheet(rows);
 
-        // 2. Tambahkan pengaturan lembar kerja tambahan untuk memaksa render garis borders di beberapa versi Excel
-        ws['!margins'] = { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
+          worksheet["!views"] = [{
+            showGridLines: true,
+            workbookViewId: 0,
+            zoomScale: 100,
+            zoomScaleNormal: 100
+          }];
 
-        // 3. Dekode ulang rentang sel (range) secara presisi demi memastikan seluruh koordinat sel terikat aturan grid
-        if (ws['!ref']) {
-            var range = XLSX.utils.decode_range(ws['!ref']);
-            ws['!ref'] = XLSX.utils.encode_range(range);
+          worksheet["!margins"] = {
+            left: 0.7,
+            right: 0.7,
+            top: 0.75,
+            bottom: 0.75,
+            header: 0.3,
+            footer: 0.3
+          };
+
+          const sheetName = createSafeSheetName(vendor, usedSheetNames);
+          XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        });
+
+        const cleanFileName = String(namaUnit || "Rekap")
+          .replace(/[^a-zA-Z0-9]/g, "_");
+
+        XLSX.writeFile(workbook, `Rekap_ATK_${cleanFileName}.xlsx`);
+
+        if (button) {
+          button.disabled = false;
+          button.textContent = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
         }
-        // ============================================================
-
-        var safeSheetName = vendorName.substring(0, 31);
-        XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
-    }
-
-    var namaFileClean = (namaUnit || "Rekap").replace(/[^a-zA-Z0-9]/g, "_");
-    XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
-
-    if(btn) {
-        btn.disabled = false;
-        btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
-    }
-}
-
-      
+      }
     </script>
   </body>
 </html>
