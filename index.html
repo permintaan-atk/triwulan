@@ -136,7 +136,9 @@
             list.forEach(item => {
               var opt = document.createElement('option');
               opt.value = item.kode;
-              opt.innerHTML = item.kode + " - " + item.deskripsi;
+              // Menambahkan kembali informasi Harga dan Vendor pada teks pilihan dropdown
+              var formatHarga = Number(item.harga || 0).toLocaleString('id-ID');
+              opt.innerHTML = item.kode + " - " + item.deskripsi + " (Rp " + formatHarga + ")";
               select.appendChild(opt);
             });
             loader.style.display = "none";
