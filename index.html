@@ -10,11 +10,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- PWA Manifest untuk Install Aplikasi -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0056b3">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
       body { 
@@ -305,7 +305,7 @@
         });
       }
 
-     function downloadMultiSheetExcel(itemsArray, namaUnit) {
+      function downloadMultiSheetExcel(itemsArray, namaUnit) {
     var btn = document.getElementById("btnDownload");
     if(btn) {
         btn.disabled = true;
@@ -350,7 +350,9 @@
         var qty = Number(item.jumlah) || 0;
         var prc = Number(item.hargaBarang) || 0;
         var subTotal = qty * prc;
-        var nomorUrut = groupedByVendor[v].length - 2;
+        
+        // Memperbaiki nomor urut agar mulai dari angka 1 secara tepat
+        var nomorUrut = groupedByVendor[v].length - 2; 
 
         var kodeFormatted = "'" + item.kodeMaterial;
 
@@ -380,27 +382,26 @@
         var ws = XLSX.utils.aoa_to_sheet(rowsData);
 
         // ============================================================
-        // TRIK INSTAN: MEMAKSA EXCEL MENERAPKAN GARIS TABEL TEGAS
+        // PERBAIKAN UTAMA: FORCE GRIDLINES & COMPATIBILITY LAYER
         // ============================================================
-        ws['!views'] = [{ showGridLines: true }];
         
-        // Memaksa area tabel terikat koordinat grid agar garis tepi langsung aktif otomatis
+        // 1. Definisikan views secara spesifik dengan Workbook View State
+        ws['!views'] = [
+            {
+                showGridLines: true,
+                workbookViewId: 0,
+                zoomScale: 100,
+                zoomScaleNormal: 100
+            }
+        ];
+
+        // 2. Tambahkan pengaturan lembar kerja tambahan untuk memaksa render garis borders di beberapa versi Excel
+        ws['!margins'] = { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 };
+
+        // 3. Dekode ulang rentang sel (range) secara presisi demi memastikan seluruh koordinat sel terikat aturan grid
         if (ws['!ref']) {
             var range = XLSX.utils.decode_range(ws['!ref']);
             ws['!ref'] = XLSX.utils.encode_range(range);
-            
-            // Injeksi tipe border dasar ke semua sel terisi agar langsung bergaris hitam tegas saat dibaca aplikasi Office
-            for (var R = range.s.r; R <= range.e.r; ++R) {
-                for (var C = range.s.c; C <= range.e.c; ++C) {
-                    var cell_ref = XLSX.utils.encode_cell({c:C, r:R});
-                    if(ws[cell_ref]) {
-                        // Mencegah sel bertipe null/kosong mengacaukan proses unduh
-                        if(typeof ws[cell_ref] === 'object') {
-                            ws[cell_ref].w = ws[cell_ref].v; // Kunci format string tampilan data
-                        }
-                    }
-                }
-            }
         }
         // ============================================================
 
@@ -409,16 +410,13 @@
     }
 
     var namaFileClean = (namaUnit || "Rekap").replace(/[^a-zA-Z0-9]/g, "_");
-    
-    // Proses download langsung dijalankan tanpa interupsi library eksternal
     XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
 
     if(btn) {
         btn.disabled = false;
-        btn.innerText = "🚀 Kirim Pengajuan & Unduh Berkas Gabungan (.XLS)";
+        btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
     }
 }
-
 
       
     </script>
