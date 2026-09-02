@@ -1,715 +1,775 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>E-Form Permintaan ATK Triwulan</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>E-Form Permintaan ATK Triwulan</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <meta name="theme-color" content="#0056b3">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- Mendukung border dan style pada file Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
-    <style>
-      body {
-        background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 1rem;
-      }
+  <meta name="theme-color" content="#0056b3">
 
-      .main-container {
-        width: 100%;
-        max-width: 750px;
-        margin: 0 auto;
-      }
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+      font-family: "Plus Jakarta Sans", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
 
-      .card-form {
-        border-radius: 20px;
-        border: none;
-        box-shadow: 0 10px 40px rgba(0, 56, 179, 0.04);
-        background: #ffffff;
-        overflow: hidden;
-        width: 100%;
-      }
+    .main-container {
+      width: 100%;
+      max-width: 750px;
+      margin: 0 auto;
+    }
 
-      .brand-header {
-        background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
-        padding: 1.5rem;
-        text-align: center;
-        color: white;
-      }
+    .card-form {
+      border-radius: 20px;
+      border: none;
+      box-shadow: 0 10px 40px rgba(0, 56, 179, 0.04);
+      background: #fff;
+      overflow: hidden;
+    }
 
-      .logo-container {
-        width: 75px;
-        height: 75px;
-        background-color: #ffffff;
-        border-radius: 50%;
-        margin: 0 auto 0.8rem auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        padding: 6px;
-      }
+    .brand-header {
+      background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+      padding: 1.5rem;
+      text-align: center;
+      color: #fff;
+    }
 
-      .logo-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
+    .logo-container {
+      width: 75px;
+      height: 75px;
+      background: #fff;
+      border-radius: 50%;
+      margin: 0 auto 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 6px;
+    }
 
-      .form-section {
-        padding: 2.5rem;
-      }
+    .logo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
 
-      .inner-card {
-        border-radius: 15px;
-        border: 1px solid #eef2f7;
-        background-color: #fafdff;
-        padding: 1.5rem;
-      }
+    .form-section {
+      padding: 2.5rem;
+    }
 
-      .form-label {
-        font-weight: 600;
-        color: #4a5568;
-        font-size: 0.9rem;
-      }
+    .inner-card {
+      border-radius: 15px;
+      border: 1px solid #eef2f7;
+      background: #fafdff;
+      padding: 1.5rem;
+    }
 
-      .form-control,
-      .form-select {
-        border-radius: 10px;
-        border: 1.5px solid #e2e8f0;
-        padding: 0.6rem 1rem;
-        font-size: 0.95rem;
-      }
+    .form-label {
+      font-weight: 600;
+      color: #4a5568;
+      font-size: 0.9rem;
+    }
 
-      .btn-add {
-        background: #17a2b8;
-        border: none;
-        color: white;
-        border-radius: 10px;
-        font-weight: 600;
-        padding: 0.7rem;
-      }
+    .form-control,
+    .form-select {
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      padding: 0.6rem 1rem;
+      font-size: 0.95rem;
+    }
 
-      .btn-add:hover {
-        background: #138496;
-        color: white;
-      }
+    .btn-add {
+      background: #17a2b8;
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      font-weight: 600;
+      padding: 0.7rem;
+    }
 
-      .btn-submit {
-        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-        border: none;
-        border-radius: 12px;
-      }
+    .btn-add:hover {
+      background: #138496;
+      color: #fff;
+    }
 
-      .loading-overlay {
-        font-size: 0.85rem;
-        font-weight: 500;
-        color: #64748b;
-      }
+    .btn-submit {
+      background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+      border: none;
+      border-radius: 12px;
+    }
 
-      .spinner-custom {
-        width: 1.2rem;
-        height: 1.2rem;
-        border-width: 0.18em;
-      }
-    </style>
-  </head>
+    .loading-overlay {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #64748b;
+    }
 
-  <body>
-    <div class="main-container">
-      <div class="card card-form">
-        <div class="brand-header">
-          <div class="logo-container">
-            <img
-              src="https://i.ibb.co.com/hR56HGdP/Logo-Maranatha-Universitas-Kristen-Maranatha-Original-PNG.png"
-              alt="Logo Maranatha"
-            >
-          </div>
-          <h4 class="fw-bold mb-1">E-Form Permintaan ATK Triwulan</h4>
-          <p class="mb-0 opacity-75 small">Sistem Pengajuan Multi-Item (GitHub Hosted)</p>
+    .spinner-custom {
+      width: 1.2rem;
+      height: 1.2rem;
+      border-width: 0.18em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-container">
+    <div class="card card-form">
+      <div class="brand-header">
+        <div class="logo-container">
+          <img src="https://i.ibb.co.com/hR56HGdP/Logo-Maranatha-Universitas-Kristen-Maranatha-Original-PNG.png" alt="Logo Maranatha">
         </div>
+        <h4 class="fw-bold mb-1">E-Form Permintaan ATK Triwulan</h4>
+        <p class="mb-0 opacity-75 small">Sistem Pengajuan Multi-Item (GitHub Hosted)</p>
+      </div>
 
-        <div class="form-section">
-          <form id="atkForm">
-            <div class="mb-4">
-              <label class="form-label mb-2">🏢 Nama Unit Kerja / Direktorat Anda</label>
+      <div class="form-section">
+        <form id="atkForm">
+          <div class="mb-4">
+            <label class="form-label mb-2">🏢 Nama Unit Kerja / Direktorat Anda</label>
 
-              <div id="unitLoading" class="loading-overlay mb-2">
+            <div id="unitLoading" class="loading-overlay mb-2">
+              <div class="spinner-border spinner-custom text-primary me-2" role="status"></div>
+              Memuat daftar unit kerja...
+            </div>
+
+            <select id="dropdownUnit" class="form-select shadow-sm" style="display:none" required>
+              <option value="">-- Pilih Unit Kerja Anda --</option>
+            </select>
+
+            <input type="hidden" id="lokasiUnit">
+          </div>
+
+          <div class="inner-card mb-4">
+            <h6 class="fw-bold text-dark mb-3">
+              <span class="badge bg-primary me-2">Step 2</span>
+              Tambah Item Barang ke Keranjang
+            </h6>
+
+            <input type="hidden" id="vendorTarget">
+            <input type="hidden" id="deskripsiBarang">
+            <input type="hidden" id="satuanBarang">
+            <input type="hidden" id="merkBarang">
+            <input type="hidden" id="hargaBarang">
+
+            <div class="mb-3">
+              <label class="form-label small mb-1">📦 Pilih Barang / Material</label>
+
+              <div id="materialLoading" class="loading-overlay mb-2">
                 <div class="spinner-border spinner-custom text-primary me-2" role="status"></div>
-                Memuat daftar unit kerja...
+                Memuat database material barang...
               </div>
 
-              <select
-                id="dropdownUnit"
-                class="form-select shadow-sm"
-                style="display: none;"
-                required
-              >
-                <option value="">-- Pilih Unit Kerja Anda --</option>
+              <select id="dropdownMaterial" class="form-select shadow-sm" style="display:none">
+                <option value="">-- Pilih Kode & Deskripsi --</option>
               </select>
 
-              <input type="hidden" id="lokasiUnit">
+              <div id="vendorBadge" class="form-text text-primary fw-bold mt-2" style="font-size:.85rem"></div>
             </div>
 
-            <div class="inner-card mb-4">
-              <h6 class="fw-bold text-dark mb-3">
-                <span class="badge bg-primary me-2">Step 2</span>
-                Tambah Item Barang ke Keranjang
-              </h6>
-
-              <input type="hidden" id="vendorTarget">
-              <input type="hidden" id="deskripsiBarang">
-              <input type="hidden" id="satuanBarang">
-              <input type="hidden" id="merkBarang">
-              <input type="hidden" id="hargaBarang">
-
-              <div class="mb-3">
-                <label class="form-label small mb-1">📦 Pilih Barang / Material</label>
-
-                <div id="materialLoading" class="loading-overlay mb-2">
-                  <div class="spinner-border spinner-custom text-primary me-2" role="status"></div>
-                  Memuat database material barang...
-                </div>
-
-                <select
-                  id="dropdownMaterial"
-                  class="form-select shadow-sm"
-                  style="display: none;"
-                >
-                  <option value="">-- Pilih Kode & Deskripsi --</option>
-                </select>
-
-                <div id="vendorBadge" class="form-text text-primary fw-bold mt-2" style="font-size: 0.85rem;"></div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label small mb-1">🔢 Jumlah Permintaan</label>
-                <input
-                  type="number"
-                  id="jumlah"
-                  class="form-control shadow-sm"
-                  min="1"
-                  step="1"
-                  placeholder="Masukkan jumlah angka"
-                >
-              </div>
-
-              <button type="button" id="btnAdd" class="btn btn-add w-100 fw-bold shadow-sm mt-2">
-                ➕ Masukkan ke Keranjang
-              </button>
-            </div>
-          </form>
-
-          <div id="tabelKeranjangArea" class="card p-3 border-0 bg-light" style="display: none; border-radius: 15px;">
-            <h6 class="fw-bold text-dark mb-3">🛒 Daftar Keranjang Pengajuan Anda:</h6>
-
-            <div class="table-responsive rounded-3 overflow-hidden shadow-sm bg-white">
-              <table class="table table-hover table-striped align-middle mb-0 small">
-                <thead class="table-dark">
-                  <tr>
-                    <th class="ps-3">Kode</th>
-                    <th>Nama Barang</th>
-                    <th>Vendor</th>
-                    <th class="text-center">Jumlah</th>
-                    <th class="text-center pe-3">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="bodyKeranjang"></tbody>
-              </table>
+            <div class="mb-3">
+              <label class="form-label small mb-1">🔢 Jumlah Permintaan</label>
+              <input type="number" id="jumlah" class="form-control shadow-sm" min="1" step="1" placeholder="Masukkan jumlah angka">
             </div>
 
-            <button
-              type="button"
-              id="btnSubmit"
-              class="btn btn-submit text-white w-100 fw-bold py-2 mt-3 shadow"
-            >
-              🚀 Kirim Pengajuan & Unduh Berkas Gabungan (.XLS)
+            <button type="button" id="btnAdd" class="btn btn-add w-100 fw-bold shadow-sm mt-2">
+              ➕ Masukkan ke Keranjang
             </button>
           </div>
+        </form>
 
-          <div id="output" class="text-center mt-3"></div>
+        <div id="tabelKeranjangArea" class="card p-3 border-0 bg-light" style="display:none;border-radius:15px">
+          <h6 class="fw-bold text-dark mb-3">🛒 Daftar Keranjang Pengajuan Anda:</h6>
+
+          <div class="table-responsive rounded-3 overflow-hidden shadow-sm bg-white">
+            <table class="table table-hover table-striped align-middle mb-0 small">
+              <thead class="table-dark">
+                <tr>
+                  <th class="ps-3">Kode</th>
+                  <th>Nama Barang</th>
+                  <th>Vendor</th>
+                  <th class="text-center">Jumlah</th>
+                  <th class="text-center pe-3">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="bodyKeranjang"></tbody>
+            </table>
+          </div>
+
+          <button type="button" id="btnSubmit" class="btn btn-submit text-white w-100 fw-bold py-2 mt-3 shadow">
+            🚀 Kirim Pengajuan & Unduh Berkas Gabungan (.XLS)
+          </button>
         </div>
+
+        <div id="output" class="text-center mt-3"></div>
       </div>
     </div>
+  </div>
 
-    <script>
-      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqY3E8sUH5iaG-CPA0AgHNdNMmhy2UmoW97BKp2WOOSQNXu5y7kafZPVEaYQ4-xaWC/exec";
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwqY3E8sUH5iaG-CPA0AgHNdNMmhy2UmoW97BKp2WOOSQNXu5y7kafZPVEaYQ4-xaWC/exec";
 
-      let globalMaterials = [];
-      let globalUnits = [];
-      let keranjangBarang = [];
+    let globalMaterials = [];
+    let globalUnits = [];
+    let keranjangBarang = [];
 
-      window.addEventListener("load", () => {
-        document.getElementById("btnAdd").addEventListener("click", tambahKeDaftar);
-        document.getElementById("btnSubmit").addEventListener("click", kirimSemuaData);
-        document.getElementById("dropdownMaterial").addEventListener("change", updateMaterialMeta);
-        document.getElementById("dropdownUnit").addEventListener("change", updateUnitMeta);
+    window.addEventListener("load", () => {
+      document.getElementById("btnAdd").addEventListener("click", tambahKeDaftar);
+      document.getElementById("btnSubmit").addEventListener("click", kirimSemuaData);
+      document.getElementById("dropdownMaterial").addEventListener("change", updateMaterialMeta);
+      document.getElementById("dropdownUnit").addEventListener("change", updateUnitMeta);
 
-        loadMaterials();
-        loadUnits();
+      loadMaterials();
+      loadUnits();
+    });
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+
+      return response.json();
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value == null ? "" : String(value);
+    }
+
+    async function loadMaterials() {
+      const loader = document.getElementById("materialLoading");
+      const select = document.getElementById("dropdownMaterial");
+
+      try {
+        const list = await fetchJson(WEB_APP_URL + "?action=getMaterial");
+
+        if (!Array.isArray(list)) {
+          throw new Error("Format data material tidak valid.");
+        }
+
+        globalMaterials = list;
+        select.replaceChildren();
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "-- Pilih Kode & Deskripsi --";
+        select.appendChild(defaultOption);
+
+        list.forEach(item => {
+          const kode = String(item.kode ?? "");
+          const deskripsi = String(item.deskripsi ?? "");
+          const harga = Number(item.harga) || 0;
+          const option = document.createElement("option");
+
+          option.value = kode;
+          option.textContent = `${kode} - ${deskripsi} (Rp ${harga.toLocaleString("id-ID")})`;
+          select.appendChild(option);
+        });
+
+        loader.style.display = "none";
+        select.style.display = "block";
+      } catch (error) {
+        loader.textContent = "❌ Gagal memuat material.";
+        console.error(error);
+      }
+    }
+
+    async function loadUnits() {
+      const loader = document.getElementById("unitLoading");
+      const select = document.getElementById("dropdownUnit");
+
+      try {
+        const list = await fetchJson(WEB_APP_URL + "?action=getUnit");
+
+        if (!Array.isArray(list)) {
+          throw new Error("Format data unit tidak valid.");
+        }
+
+        globalUnits = list;
+        select.replaceChildren();
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "-- Pilih Unit Kerja Anda --";
+        select.appendChild(defaultOption);
+
+        list.forEach(item => {
+          const namaUnit = String(item.namaUnit ?? "");
+          const option = document.createElement("option");
+
+          option.value = namaUnit;
+          option.textContent = namaUnit;
+          select.appendChild(option);
+        });
+
+        loader.style.display = "none";
+        select.style.display = "block";
+      } catch (error) {
+        loader.textContent = "❌ Gagal memuat unit.";
+        console.error(error);
+      }
+    }
+
+    function updateMaterialMeta() {
+      const value = document.getElementById("dropdownMaterial").value;
+      const item = globalMaterials.find(material => String(material.kode) === String(value));
+
+      if (!item) {
+        ["vendorTarget", "deskripsiBarang", "satuanBarang", "merkBarang", "hargaBarang"]
+          .forEach(id => document.getElementById(id).value = "");
+
+        setText("vendorBadge", "");
+        return;
+      }
+
+      const harga = Number(item.harga) || 0;
+
+      document.getElementById("vendorTarget").value = item.vendor ?? "";
+      document.getElementById("deskripsiBarang").value = item.deskripsi ?? "";
+      document.getElementById("satuanBarang").value = item.satuan ?? "";
+      document.getElementById("merkBarang").value = item.merk ?? "";
+      document.getElementById("hargaBarang").value = harga;
+
+      setText(
+        "vendorBadge",
+        `🏢 Vendor: ${item.vendor ?? "-"} | 💰 Harga: Rp ${harga.toLocaleString("id-ID")}`
+      );
+    }
+
+    function updateUnitMeta() {
+      const value = document.getElementById("dropdownUnit").value;
+      const item = globalUnits.find(unit => String(unit.namaUnit) === String(value));
+
+      document.getElementById("lokasiUnit").value = item?.lokasi ?? "";
+    }
+
+    function tambahKeDaftar() {
+      const unitSelect = document.getElementById("dropdownUnit");
+      const materialSelect = document.getElementById("dropdownMaterial");
+      const quantityInput = document.getElementById("jumlah");
+
+      if (!unitSelect.value) {
+        alert("Silakan pilih Nama Unit Anda terlebih dahulu!");
+        unitSelect.focus();
+        return;
+      }
+
+      const kode = materialSelect.value;
+      const jumlah = Number(quantityInput.value);
+
+      if (!kode) {
+        alert("Silakan pilih barang terlebih dahulu!");
+        materialSelect.focus();
+        return;
+      }
+
+      if (!Number.isInteger(jumlah) || jumlah < 1) {
+        alert("Jumlah harus berupa bilangan bulat minimal 1.");
+        quantityInput.focus();
+        return;
+      }
+
+      const item = globalMaterials.find(material => String(material.kode) === String(kode));
+
+      if (!item) {
+        alert("Data material tidak ditemukan.");
+        return;
+      }
+
+      keranjangBarang.push({
+        kodeMaterial: String(kode),
+        jumlah,
+        vendorTarget: item.vendor ?? "",
+        deskripsiBarang: item.deskripsi ?? "",
+        satuanBarang: item.satuan ?? "",
+        merkBarang: item.merk ?? "",
+        hargaBarang: Number(item.harga) || 0
       });
 
-      async function fetchJson(url, options = {}) {
-        const response = await fetch(url, options);
+      unitSelect.disabled = true;
+      materialSelect.value = "";
+      quantityInput.value = "";
+      setText("vendorBadge", "");
+      updateMaterialMeta();
+      renderTabelKeranjang();
+    }
 
-        if (!response.ok) {
-          throw new Error("HTTP error " + response.status);
-        }
+    function renderTabelKeranjang() {
+      const tbody = document.getElementById("bodyKeranjang");
+      const area = document.getElementById("tabelKeranjangArea");
+      const unitSelect = document.getElementById("dropdownUnit");
+      const submitButton = document.getElementById("btnSubmit");
 
-        return response.json();
+      tbody.replaceChildren();
+
+      if (keranjangBarang.length === 0) {
+        area.style.display = "none";
+        unitSelect.disabled = false;
+        submitButton.disabled = false;
+        return;
       }
 
-      function setText(elementId, value) {
-        document.getElementById(elementId).textContent = value == null ? "" : String(value);
+      area.style.display = "block";
+
+      keranjangBarang.forEach((item, index) => {
+        const row = document.createElement("tr");
+
+        const kodeCell = document.createElement("td");
+        kodeCell.className = "ps-3";
+        kodeCell.textContent = item.kodeMaterial;
+
+        const descriptionCell = document.createElement("td");
+        descriptionCell.textContent = item.deskripsiBarang;
+
+        const vendorCell = document.createElement("td");
+        const vendorBadge = document.createElement("span");
+        vendorBadge.className = "badge bg-primary";
+        vendorBadge.textContent = item.vendorTarget || "-";
+        vendorCell.appendChild(vendorBadge);
+
+        const quantityCell = document.createElement("td");
+        quantityCell.className = "text-center fw-bold";
+        quantityCell.textContent = item.jumlah;
+
+        const actionCell = document.createElement("td");
+        actionCell.className = "text-center pe-3";
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "btn btn-danger btn-sm py-0";
+        deleteButton.textContent = "Hapus";
+        deleteButton.addEventListener("click", () => hapusItemKeranjang(index));
+
+        actionCell.appendChild(deleteButton);
+        row.append(kodeCell, descriptionCell, vendorCell, quantityCell, actionCell);
+        tbody.appendChild(row);
+      });
+    }
+
+    function hapusItemKeranjang(index) {
+      if (index < 0 || index >= keranjangBarang.length) return;
+
+      keranjangBarang.splice(index, 1);
+      renderTabelKeranjang();
+    }
+
+    async function kirimSemuaData() {
+      const button = document.getElementById("btnSubmit");
+      const output = document.getElementById("output");
+
+      if (keranjangBarang.length === 0) {
+        alert("Keranjang masih kosong.");
+        return;
       }
 
-      async function loadMaterials() {
-        const loader = document.getElementById("materialLoading");
-        const select = document.getElementById("dropdownMaterial");
+      button.disabled = true;
+      output.textContent = "";
 
-        try {
-          const list = await fetchJson(WEB_APP_URL + "?action=getMaterial");
+      const loadingMessage = document.createElement("div");
+      loadingMessage.className = "alert alert-warning fw-bold";
+      loadingMessage.textContent = "Sedang mendistribusikan data ke masing-masing vendor & menyusun berkas Excel...";
+      output.appendChild(loadingMessage);
 
-          if (!Array.isArray(list)) {
-            throw new Error("Format data material tidak valid.");
-          }
+      const finalPayload = {
+        namaUnit: document.getElementById("dropdownUnit").value,
+        lokasiUnit: document.getElementById("lokasiUnit").value,
+        items: keranjangBarang
+      };
 
-          globalMaterials = list;
-          select.replaceChildren();
-
-          const defaultOption = document.createElement("option");
-          defaultOption.value = "";
-          defaultOption.textContent = "-- Pilih Kode & Deskripsi --";
-          select.appendChild(defaultOption);
-
-          list.forEach(item => {
-            const option = document.createElement("option");
-            const kode = item.kode == null ? "" : String(item.kode);
-            const deskripsi = item.deskripsi == null ? "" : String(item.deskripsi);
-            const harga = Number(item.harga) || 0;
-
-            option.value = kode;
-            option.textContent = `${kode} - ${deskripsi} (Rp ${harga.toLocaleString("id-ID")})`;
-            select.appendChild(option);
-          });
-
-          loader.style.display = "none";
-          select.style.display = "block";
-        } catch (error) {
-          loader.textContent = "❌ Gagal memuat material.";
-          console.error(error);
-        }
-      }
-
-      async function loadUnits() {
-        const loader = document.getElementById("unitLoading");
-        const select = document.getElementById("dropdownUnit");
-
-        try {
-          const list = await fetchJson(WEB_APP_URL + "?action=getUnit");
-
-          if (!Array.isArray(list)) {
-            throw new Error("Format data unit tidak valid.");
-          }
-
-          globalUnits = list;
-          select.replaceChildren();
-
-          const defaultOption = document.createElement("option");
-          defaultOption.value = "";
-          defaultOption.textContent = "-- Pilih Unit Kerja Anda --";
-          select.appendChild(defaultOption);
-
-          list.forEach(item => {
-            const namaUnit = item.namaUnit == null ? "" : String(item.namaUnit);
-            const option = document.createElement("option");
-
-            option.value = namaUnit;
-            option.textContent = namaUnit;
-            select.appendChild(option);
-          });
-
-          loader.style.display = "none";
-          select.style.display = "block";
-        } catch (error) {
-          loader.textContent = "❌ Gagal memuat unit.";
-          console.error(error);
-        }
-      }
-
-      function updateMaterialMeta() {
-        const value = document.getElementById("dropdownMaterial").value;
-
-        const item = globalMaterials.find(
-          material => String(material.kode) === String(value)
-        );
-
-        if (!item) {
-          document.getElementById("vendorTarget").value = "";
-          document.getElementById("deskripsiBarang").value = "";
-          document.getElementById("satuanBarang").value = "";
-          document.getElementById("merkBarang").value = "";
-          document.getElementById("hargaBarang").value = "";
-          setText("vendorBadge", "");
-          return;
-        }
-
-        const harga = Number(item.harga) || 0;
-
-        document.getElementById("vendorTarget").value = item.vendor ?? "";
-        document.getElementById("deskripsiBarang").value = item.deskripsi ?? "";
-        document.getElementById("satuanBarang").value = item.satuan ?? "";
-        document.getElementById("merkBarang").value = item.merk ?? "";
-        document.getElementById("hargaBarang").value = harga;
-
-        setText(
-          "vendorBadge",
-          `🏢 Vendor: ${item.vendor ?? "-"} | 💰 Harga: Rp ${harga.toLocaleString("id-ID")}`
-        );
-      }
-
-      function updateUnitMeta() {
-        const value = document.getElementById("dropdownUnit").value;
-
-        const item = globalUnits.find(
-          unit => String(unit.namaUnit) === String(value)
-        );
-
-        document.getElementById("lokasiUnit").value = item?.lokasi ?? "";
-      }
-
-      function tambahKeDaftar() {
-        const unitSelect = document.getElementById("dropdownUnit");
-        const materialSelect = document.getElementById("dropdownMaterial");
-        const quantityInput = document.getElementById("jumlah");
-
-        if (!unitSelect.value) {
-          alert("Silakan pilih Nama Unit Anda terlebih dahulu!");
-          unitSelect.focus();
-          return;
-        }
-
-        const kode = materialSelect.value;
-        const jumlah = Number(quantityInput.value);
-
-        if (!kode) {
-          alert("Silakan pilih barang terlebih dahulu!");
-          materialSelect.focus();
-          return;
-        }
-
-        if (!Number.isInteger(jumlah) || jumlah < 1) {
-          alert("Jumlah harus berupa bilangan bulat minimal 1.");
-          quantityInput.focus();
-          return;
-        }
-
-        const item = globalMaterials.find(
-          material => String(material.kode) === String(kode)
-        );
-
-        if (!item) {
-          alert("Data material tidak ditemukan.");
-          return;
-        }
-
-        keranjangBarang.push({
-          kodeMaterial: String(kode),
-          jumlah,
-          vendorTarget: item.vendor ?? "",
-          deskripsiBarang: item.deskripsi ?? "",
-          satuanBarang: item.satuan ?? "",
-          merkBarang: item.merk ?? "",
-          hargaBarang: Number(item.harga) || 0
+      try {
+        const response = await fetchJson(WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify(finalPayload)
         });
 
-        unitSelect.disabled = true;
-        materialSelect.value = "";
-        quantityInput.value = "";
-        setText("vendorBadge", "");
-        updateMaterialMeta();
-        renderTabelKeranjang();
-      }
-
-      function renderTabelKeranjang() {
-        const tbody = document.getElementById("bodyKeranjang");
-        const area = document.getElementById("tabelKeranjangArea");
-        const unitSelect = document.getElementById("dropdownUnit");
-        const submitButton = document.getElementById("btnSubmit");
-
-        tbody.replaceChildren();
-
-        if (keranjangBarang.length === 0) {
-          area.style.display = "none";
-          unitSelect.disabled = false;
-          submitButton.disabled = false;
-          return;
+        if (!response || response.status !== "Sukses") {
+          throw new Error(response?.message || "Terjadi kesalahan pada server.");
         }
 
-        area.style.display = "block";
+        const submittedItems = keranjangBarang.map(item => ({ ...item }));
+        const activeUnit = document.getElementById("dropdownUnit").value;
 
-        keranjangBarang.forEach((item, index) => {
-          const row = document.createElement("tr");
+        output.replaceChildren();
 
-          const kodeCell = document.createElement("td");
-          kodeCell.className = "ps-3";
-          kodeCell.textContent = item.kodeMaterial;
+        const successMessage = document.createElement("div");
+        successMessage.className = "alert alert-success fw-bold";
+        successMessage.textContent = "✅ Semua Permintaan Berhasil Terdistribusi Ke Sheet Masing-Masing Vendor!";
 
-          const descriptionCell = document.createElement("td");
-          descriptionCell.textContent = item.deskripsiBarang;
+        const downloadCard = document.createElement("div");
+        downloadCard.className = "card p-3 mt-2";
+        downloadCard.style.border = "2px dashed #007bff";
+        downloadCard.style.backgroundColor = "#f8f9fa";
 
-          const vendorCell = document.createElement("td");
-          const vendorBadge = document.createElement("span");
-          vendorBadge.className = "badge bg-primary";
-          vendorBadge.textContent = item.vendorTarget || "-";
-          vendorCell.appendChild(vendorBadge);
+        const description = document.createElement("p");
+        description.className = "text-muted small mb-2 fw-semibold";
+        description.textContent = "Silakan unduh berkas rekap multi-tab khusus unit Anda di bawah ini:";
 
-          const quantityCell = document.createElement("td");
-          quantityCell.className = "text-center fw-bold";
-          quantityCell.textContent = item.jumlah;
-
-          const actionCell = document.createElement("td");
-          actionCell.className = "text-center pe-3";
-
-          const deleteButton = document.createElement("button");
-          deleteButton.type = "button";
-          deleteButton.className = "btn btn-danger btn-sm py-0";
-          deleteButton.textContent = "Hapus";
-          deleteButton.addEventListener("click", () => hapusItemKeranjang(index));
-
-          actionCell.appendChild(deleteButton);
-          row.append(kodeCell, descriptionCell, vendorCell, quantityCell, actionCell);
-          tbody.appendChild(row);
+        const downloadButton = document.createElement("button");
+        downloadButton.type = "button";
+        downloadButton.id = "btnDownload";
+        downloadButton.className = "btn btn-primary fw-bold w-100 py-2";
+        downloadButton.textContent = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+        downloadButton.addEventListener("click", () => {
+          downloadMultiSheetExcel(submittedItems, activeUnit);
         });
-      }
 
-      function hapusItemKeranjang(index) {
-        if (index < 0 || index >= keranjangBarang.length) return;
+        downloadCard.append(description, downloadButton);
+        output.append(successMessage, downloadCard);
 
-        keranjangBarang.splice(index, 1);
+        keranjangBarang = [];
         renderTabelKeranjang();
+      } catch (error) {
+        output.replaceChildren();
+
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "alert alert-danger fw-bold";
+        errorMessage.textContent = "❌ Gagal: " + error.message;
+        output.appendChild(errorMessage);
+
+        button.disabled = false;
+        console.error(error);
+      }
+    }
+
+    function createSafeSheetName(name, usedNames) {
+      let baseName = String(name || "Lainnya")
+        .replace(/[:\\/?*\[\]]/g, "-")
+        .replace(/^'+|'+$/g, "")
+        .trim()
+        .substring(0, 31);
+
+      if (!baseName) baseName = "Lainnya";
+
+      let sheetName = baseName;
+      let counter = 1;
+
+      while (usedNames.has(sheetName)) {
+        const suffix = ` (${counter})`;
+        sheetName = baseName.substring(0, 31 - suffix.length) + suffix;
+        counter++;
       }
 
-      async function kirimSemuaData() {
-        const button = document.getElementById("btnSubmit");
-        const output = document.getElementById("output");
+      usedNames.add(sheetName);
+      return sheetName;
+    }
 
-        if (keranjangBarang.length === 0) {
-          alert("Keranjang masih kosong.");
-          return;
+    function applyExcelStyles(worksheet, rows) {
+      const border = {
+        top: { style: "medium", color: { rgb: "000000" } },
+        bottom: { style: "medium", color: { rgb: "000000" } },
+        left: { style: "medium", color: { rgb: "000000" } },
+        right: { style: "medium", color: { rgb: "000000" } }
+      };
+
+      const thinBorder = {
+        top: { style: "thin", color: { rgb: "000000" } },
+        bottom: { style: "thin", color: { rgb: "000000" } },
+        left: { style: "thin", color: { rgb: "000000" } },
+        right: { style: "thin", color: { rgb: "000000" } }
+      };
+
+      const titleStyle = {
+        font: { bold: true, sz: 14, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "0056B3" } },
+        alignment: { horizontal: "center", vertical: "center" },
+        border
+      };
+
+      const headerStyle = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "1F4E78" } },
+        alignment: { horizontal: "center", vertical: "center", wrapText: true },
+        border
+      };
+
+      const bodyStyle = {
+        border: thinBorder,
+        alignment: { vertical: "center", wrapText: true }
+      };
+
+      const footerStyle = {
+        font: { italic: true, color: { rgb: "666666" } },
+        alignment: { wrapText: true }
+      };
+
+      const range = XLSX.utils.decode_range(worksheet["!ref"]);
+
+      for (let row = range.s.r; row <= range.e.r; row++) {
+        for (let col = range.s.c; col <= range.e.c; col++) {
+          const address = XLSX.utils.encode_cell({ r: row, c: col });
+          const cell = worksheet[address];
+
+          if (!cell) continue;
+
+          if (row === 0) {
+            cell.s = titleStyle;
+          } else if (row === 2) {
+            cell.s = headerStyle;
+          } else if (row >= 3 && row < rows.length - 2) {
+            cell.s = { ...bodyStyle };
+
+            if ([5, 8].includes(col)) {
+              cell.z = "#,##0";
+              cell.s.alignment = { horizontal: "right", vertical: "center" };
+            }
+
+            if ([0, 7].includes(col)) {
+              cell.s.alignment = { horizontal: "center", vertical: "center" };
+            }
+          } else {
+            cell.s = footerStyle;
+          }
         }
+      }
 
+      worksheet["!merges"] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 10 } },
+        { s: { r: rows.length - 1, c: 0 }, e: { r: rows.length - 1, c: 10 } }
+      ];
+
+      worksheet["!rows"] = [
+        { hpt: 25 },
+        { hpt: 8 },
+        { hpt: 35 }
+      ];
+
+      worksheet["!cols"] = [
+        { wch: 6 },
+        { wch: 18 },
+        { wch: 16 },
+        { wch: 18 },
+        { wch: 35 },
+        { wch: 15 },
+        { wch: 25 },
+        { wch: 10 },
+        { wch: 18 },
+        { wch: 25 },
+        { wch: 30 }
+      ];
+
+      worksheet["!autofilter"] = {
+        ref: `A3:K${rows.length - 2}`
+      };
+    }
+
+    function downloadMultiSheetExcel(itemsArray, namaUnit) {
+      const button = document.getElementById("btnDownload");
+
+      if (!Array.isArray(itemsArray) || itemsArray.length === 0) {
+        alert("Data keranjang kosong.");
+        return;
+      }
+
+      if (button) {
         button.disabled = true;
-        output.textContent = "";
+        button.textContent = "Menyiapkan Excel per Unit...";
+      }
 
-        const loadingMessage = document.createElement("div");
-        loadingMessage.className = "alert alert-warning fw-bold";
-        loadingMessage.textContent = "Sedang mendistribusikan data ke masing-masing vendor & menyusun berkas Excel...";
-        output.appendChild(loadingMessage);
+      const lokasiUnit = document.getElementById("lokasiUnit").value || "-";
+      const workbook = XLSX.utils.book_new();
+      const groupedByVendor = {};
 
-        const finalPayload = {
-          namaUnit: document.getElementById("dropdownUnit").value,
-          lokasiUnit: document.getElementById("lokasiUnit").value,
-          items: keranjangBarang
+      itemsArray.forEach(item => {
+        const vendor = String(item.vendorTarget || "Lainnya");
+
+        if (!groupedByVendor[vendor]) {
+          groupedByVendor[vendor] = [
+            ["PENGAJUAN PENGGUNAAN DANA ATK"],
+            [],
+            [
+              "NO",
+              "KODE MATERIAL",
+              "SATUAN PAKAI",
+              "MERK",
+              "KETERANGAN",
+              "HARGA",
+              "VENDOR",
+              "JUMLAH",
+              "JUMLAH HARGA",
+              "NAMA UNIT",
+              "LOKASI PENGIRIMAN BARANG"
+            ]
+          ];
+        }
+
+        const quantity = Number(item.jumlah) || 0;
+        const price = Number(item.hargaBarang) || 0;
+        const subtotal = quantity * price;
+        const rowNumber = groupedByVendor[vendor].length - 2;
+
+        groupedByVendor[vendor].push([
+          rowNumber,
+          "'" + String(item.kodeMaterial || ""),
+          item.satuanBarang || "",
+          item.merkBarang || "",
+          item.deskripsiBarang || "",
+          price,
+          vendor,
+          quantity,
+          subtotal,
+          namaUnit || "Unit Kerja",
+          lokasiUnit
+        ]);
+      });
+
+      const currentDate = new Date().toLocaleDateString("id-ID");
+      const usedSheetNames = new Set();
+
+      Object.keys(groupedByVendor).forEach(vendor => {
+        const rows = groupedByVendor[vendor];
+
+        rows.push([]);
+        rows.push([
+          `* Berkas gabungan sah digunakan sebagai bukti fisik penggunaan anggaran unit kerja. Dicetak otomatis pada tanggal: ${currentDate}`
+        ]);
+
+        const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+        applyExcelStyles(worksheet, rows);
+
+        worksheet["!views"] = [{
+          showGridLines: false,
+          zoomScale: 90,
+          zoomScaleNormal: 90
+        }];
+
+        worksheet["!margins"] = {
+          left: 0.7,
+          right: 0.7,
+          top: 0.75,
+          bottom: 0.75,
+          header: 0.3,
+          footer: 0.3
         };
 
-        try {
-          const response = await fetchJson(WEB_APP_URL, {
-            method: "POST",
-            body: JSON.stringify(finalPayload)
-          });
+        const sheetName = createSafeSheetName(vendor, usedSheetNames);
+        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+      });
 
-          if (!response || response.status !== "Sukses") {
-            throw new Error(response?.message || "Terjadi kesalahan pada server.");
-          }
+      const cleanFileName = String(namaUnit || "Rekap")
+        .replace(/[^a-zA-Z0-9]/g, "_");
 
-          const submittedItems = keranjangBarang.map(item => ({ ...item }));
-          const activeUnit = document.getElementById("dropdownUnit").value;
+      XLSX.writeFile(workbook, `Rekap_ATK_${cleanFileName}.xlsx`);
 
-          output.replaceChildren();
-
-          const successMessage = document.createElement("div");
-          successMessage.className = "alert alert-success fw-bold";
-          successMessage.textContent = "✅ Semua Permintaan Berhasil Terdistribusi Ke Sheet Masing-Masing Vendor!";
-
-          const downloadCard = document.createElement("div");
-          downloadCard.className = "card p-3 mt-2";
-          downloadCard.style.border = "2px dashed #007bff";
-          downloadCard.style.backgroundColor = "#f8f9fa";
-
-          const description = document.createElement("p");
-          description.className = "text-muted small mb-2 fw-semibold";
-          description.textContent = "Silakan unduh berkas rekap multi-tab khusus unit Anda di bawah ini:";
-
-          const downloadButton = document.createElement("button");
-          downloadButton.type = "button";
-          downloadButton.id = "btnDownload";
-          downloadButton.className = "btn btn-primary fw-bold w-100 py-2";
-          downloadButton.textContent = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
-          downloadButton.addEventListener("click", () => {
-            downloadMultiSheetExcel(submittedItems, activeUnit);
-          });
-
-          downloadCard.append(description, downloadButton);
-          output.append(successMessage, downloadCard);
-
-          keranjangBarang = [];
-          renderTabelKeranjang();
-        } catch (error) {
-          output.replaceChildren();
-
-          const errorMessage = document.createElement("div");
-          errorMessage.className = "alert alert-danger fw-bold";
-          errorMessage.textContent = "❌ Gagal: " + error.message;
-          output.appendChild(errorMessage);
-
-          button.disabled = false;
-          console.error(error);
-        }
+      if (button) {
+        button.disabled = false;
+        button.textContent = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
       }
-
-      function createSafeSheetName(name, usedNames) {
-        let baseName = String(name || "Lainnya")
-          .replace(/[:\\/?*\[\]]/g, "-")
-          .replace(/^'+|'+$/g, "")
-          .trim()
-          .substring(0, 31);
-
-        if (!baseName) baseName = "Lainnya";
-
-        let sheetName = baseName;
-        let counter = 1;
-
-        while (usedNames.has(sheetName)) {
-          const suffix = ` (${counter})`;
-          sheetName = baseName.substring(0, 31 - suffix.length) + suffix;
-          counter++;
-        }
-
-        usedNames.add(sheetName);
-        return sheetName;
-      }
-
-      function downloadMultiSheetExcel(itemsArray, namaUnit) {
-        const button = document.getElementById("btnDownload");
-
-        if (button) {
-          button.disabled = true;
-          button.textContent = "Menyiapkan Excel per Unit...";
-        }
-
-        if (!Array.isArray(itemsArray) || itemsArray.length === 0) {
-          alert("Data keranjang kosong.");
-
-          if (button) {
-            button.disabled = false;
-            button.textContent = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
-          }
-
-          return;
-        }
-
-        const lokasiUnit = document.getElementById("lokasiUnit").value || "-";
-        const workbook = XLSX.utils.book_new();
-        const groupedByVendor = {};
-
-        itemsArray.forEach(item => {
-          const vendor = String(item.vendorTarget || "Lainnya");
-
-          if (!groupedByVendor[vendor]) {
-            groupedByVendor[vendor] = [
-              ["PENGAJUAN PENGGUNAAN DANA ATK"],
-              [],
-              [
-                "NO",
-                "KODE MATERIAL",
-                "SATUAN PAKAI",
-                "MERK",
-                "KETERANGAN",
-                "HARGA",
-                "VENDOR",
-                "JUMLAH",
-                "JUMLAH HARGA",
-                "NAMA UNIT",
-                "LOKASI PENGIRIMAN BARANG"
-              ]
-            ];
-          }
-
-          const quantity = Number(item.jumlah) || 0;
-          const price = Number(item.hargaBarang) || 0;
-          const subtotal = quantity * price;
-          const rowNumber = groupedByVendor[vendor].length - 2;
-
-          groupedByVendor[vendor].push([
-            rowNumber,
-            "'" + String(item.kodeMaterial || ""),
-            item.satuanBarang || "",
-            item.merkBarang || "",
-            item.deskripsiBarang || "",
-            price,
-            vendor,
-            quantity,
-            subtotal,
-            namaUnit || "Unit Kerja",
-            lokasiUnit
-          ]);
-        });
-
-        const currentDate = new Date().toLocaleDateString("id-ID");
-        const usedSheetNames = new Set();
-
-        Object.keys(groupedByVendor).forEach(vendor => {
-          const rows = groupedByVendor[vendor];
-
-          rows.push([]);
-          rows.push([
-            `* Berkas gabungan sah digunakan sebagai bukti fisik penggunaan anggaran unit kerja. Dicetak otomatis pada tanggal: ${currentDate}`
-          ]);
-
-          const worksheet = XLSX.utils.aoa_to_sheet(rows);
-
-          worksheet["!views"] = [{
-            showGridLines: true,
-            workbookViewId: 0,
-            zoomScale: 100,
-            zoomScaleNormal: 100
-          }];
-
-          worksheet["!margins"] = {
-            left: 0.7,
-            right: 0.7,
-            top: 0.75,
-            bottom: 0.75,
-            header: 0.3,
-            footer: 0.3
-          };
-
-          const sheetName = createSafeSheetName(vendor, usedSheetNames);
-          XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-        });
-
-        const cleanFileName = String(namaUnit || "Rekap")
-          .replace(/[^a-zA-Z0-9]/g, "_");
-
-        XLSX.writeFile(workbook, `Rekap_ATK_${cleanFileName}.xlsx`);
-
-        if (button) {
-          button.disabled = false;
-          button.textContent = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
-        }
-      }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
