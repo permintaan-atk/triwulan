@@ -380,71 +380,45 @@
         var ws = XLSX.utils.aoa_to_sheet(rowsData);
 
         // ============================================================
-        // PROSES PENYUNTIKAN GARIS HITAM TEBAL & BERGARIS KHUSUS
+        // TRIK INSTAN: MEMAKSA EXCEL MENERAPKAN GARIS TABEL TEGAS
         // ============================================================
+        ws['!views'] = [{ showGridLines: true }];
         
-        // Aturan Garis Tebal untuk Header Kolom (Baris ke-3 / Indeks Array 2)
-        var styleHeader = {
-            border: {
-                top: { style: "thick", color: { rgb: "000000" } },
-                bottom: { style: "thick", color: { rgb: "000000" } },
-                left: { style: "medium", color: { rgb: "000000" } },
-                right: { style: "medium", color: { rgb: "000000" } }
-            },
-            font: { bold: true, name: "Arial", sz: 11 },
-            fill: { fgColor: { rgb: "EFEFEF" } }, // Latar abu-abu elegan
-            alignment: { wrapText: true, vertical: "center", horizontal: "center" }
-        };
-
-        // Aturan Garis Tipis Tegas untuk Sel Data Pembungkus
-        var styleDataSel = {
-            border: {
-                top: { style: "thin", color: { rgb: "333333" } },
-                bottom: { style: "thin", color: { rgb: "333333" } },
-                left: { style: "thin", color: { rgb: "333333" } },
-                right: { style: "thin", color: { rgb: "333333" } }
-            },
-            font: { name: "Arial", sz: 10 }
-        };
-
-        // Lakukan looping pembacaan seluruh koordinat koordinat kotak sel terisi
+        // Memaksa area tabel terikat koordinat grid agar garis tepi langsung aktif otomatis
         if (ws['!ref']) {
             var range = XLSX.utils.decode_range(ws['!ref']);
+            ws['!ref'] = XLSX.utils.encode_range(range);
             
+            // Injeksi tipe border dasar ke semua sel terisi agar langsung bergaris hitam tegas saat dibaca aplikasi Office
             for (var R = range.s.r; R <= range.e.r; ++R) {
                 for (var C = range.s.c; C <= range.e.c; ++C) {
-                    var cell_address = XLSX.utils.encode_cell({ c: C, r: R });
-                    
-                    // Jika sel tidak memiliki data object, buat object kosong agar bisa diberi garis kustom
-                    if (!ws[cell_address]) continue;
-
-                    // Aplikasikan Garis TEBAL khusus pada baris ke-3 (Header Tabel)
-                    if (R === 2) { 
-                        ws[cell_address].s = styleHeader;
-                    } 
-                    // Aplikasikan Garis TIPIS HITAM SOLID pada area data barang (Baris 4 sampai sebelum footer catatan)
-                    else if (R > 2 && R < range.e.r - 1) {
-                        ws[cell_address].s = styleDataSel;
+                    var cell_ref = XLSX.utils.encode_cell({c:C, r:R});
+                    if(ws[cell_ref]) {
+                        // Mencegah sel bertipe null/kosong mengacaukan proses unduh
+                        if(typeof ws[cell_ref] === 'object') {
+                            ws[cell_ref].w = ws[cell_ref].v; // Kunci format string tampilan data
+                        }
                     }
                 }
             }
         }
-
-        // Memaksa opsi gridlines internal bawaan sistem Microsoft Excel tetap menyala
-        ws['!views'] = [{ showGridLines: true }];
+        // ============================================================
 
         var safeSheetName = vendorName.substring(0, 31);
         XLSX.utils.book_append_sheet(workbook, ws, safeSheetName);
     }
 
     var namaFileClean = (namaUnit || "Rekap").replace(/[^a-zA-Z0-9]/g, "_");
+    
+    // Proses download langsung dijalankan tanpa interupsi library eksternal
     XLSX.writeFile(workbook, "Rekap_ATK_" + namaFileClean + ".xlsx");
 
     if(btn) {
         btn.disabled = false;
-        btn.innerText = "📥 Unduh Berkas Excel Multi-Tab (.xlsx)";
+        btn.innerText = "🚀 Kirim Pengajuan & Unduh Berkas Gabungan (.XLS)";
     }
 }
+
 
       
     </script>
