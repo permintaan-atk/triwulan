@@ -19,10 +19,10 @@
 
   <meta name="theme-color" content="#0056b3">
 
-    <style>
+      <style>
     body { 
-      /* 🌟 WARNA BARU: Perpaduan hijau sage pucat yang sangat adem dan teduh di mata */
-      background: linear-gradient(135deg, #f0f5f2 0%, #d8e4dc 100%); 
+      /* 🌟 WARNA BARU: Gradasi hijau botol yang sedikit agak gelap, teduh, dan elegan */
+      background: linear-gradient(135deg, #0b261b 0%, #13402d 100%); 
       font-family: 'Plus Jakarta Sans', sans-serif;
       min-height: 100vh;
       display: flex;
@@ -38,8 +38,8 @@
     .card-form { 
       border-radius: 20px; 
       border: none; 
-      /* 🌟 PENYESUAIAN BAYANGAN: Diperhalus dengan bias warna hijau botol transparan agar kartu menyatu lembut */
-      box-shadow: 0 12px 40px rgba(19, 64, 45, 0.05); 
+      /* 🌟 PENYESUAIAN BAYANGAN: Menggunakan pendaran bayangan gelap (hitam pekat transparan) agar kartu putih terlihat "menyala" di atas background gelap */
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); 
       background: #ffffff; 
       overflow: hidden; 
       width: 100%; 
@@ -47,7 +47,8 @@
     
     /* Tema Utama: Hijau Botol (Bottle Green Premium) */
     .brand-header { 
-      background: linear-gradient(135deg, #13402d 0%, #0b261b 100%); 
+      /* Header dibuat sedikit lebih terang dari background dasar agar ada dimensi visual */
+      background: linear-gradient(135deg, #1a4d37 0%, #13402d 100%); 
       padding: 1.5rem; 
       text-align: center; 
       color: white; 
@@ -62,7 +63,7 @@
       display: flex; 
       align-items: center; 
       justify-content: center; 
-      box-shadow: 0 4px 12px rgba(19, 64, 45, 0.12); 
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
       padding: 6px; 
     }
     .logo-container img { 
@@ -74,7 +75,7 @@
       padding: 2.5rem; 
     }
     
-    /* 🌟 KOTAK INPUT BARANG: Penyesuaian ke warna latar hijau mint super pucat agar serasi */
+    /* Kotak Input Barang: Latar belakang hijau mint super pucat */
     .inner-card { 
       border-radius: 15px; 
       border: 1px solid #e1ebe5; 
@@ -94,14 +95,14 @@
       transition: all 0.2s ease;
     }
     
-    /* 🌟 EFEK SAKLAR FOKUS: Saat kotak diklik, memancarkan bias cahaya hijau botol yang elegan */
+    /* Efek fokus saat kotak input diklik */
     .form-control:focus, .form-select:focus { 
       border-color: #1f6f4a; 
       box-shadow: 0 0 0 3.5px rgba(19, 64, 45, 0.12); 
       outline: none;
     }
     
-    /* Tombol Tambah & Kirim dengan nuansa hijau/aksen serasi */
+    /* Tombol Tambah & Kirim */
     .btn-add { 
       background: #2d6a4f; 
       border: none; 
