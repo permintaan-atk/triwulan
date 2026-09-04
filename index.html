@@ -612,7 +612,14 @@
         alignment: { wrapText: true }
       };
 
+      const signStyle = {
+        font: { bold: true },
+        alignment: { horizontal: "center", vertical: "center" }
+      };
+
       const range = XLSX.utils.decode_range(worksheet["!ref"]);
+      const lastRowIdx = rows.length - 1;
+      const signStartIdx = lastRowIdx - 5; // Batas awal baris tanda tangan di bawah
 
       for (let row = range.s.r; row <= range.e.r; row++) {
         for (let col = range.s.c; col <= range.e.c; col++) {
@@ -625,7 +632,7 @@
             cell.s = titleStyle;
           } else if (row === 2) {
             cell.s = headerStyle;
-          } else if (row >= 3 && row < rows.length - 2) {
+          } else if (row >= 3 && row < signStartIdx) {
             cell.s = { ...bodyStyle };
 
             if ([5, 8].includes(col)) {
@@ -636,15 +643,24 @@
             if ([0, 7].includes(col)) {
               cell.s.alignment = { horizontal: "center", vertical: "center" };
             }
+          } else if (row === lastRowIdx) {
+            cell.s = footerStyle; // Catatan kaki paling bawah
           } else {
-            cell.s = footerStyle;
+            // Bagian area tanda tangan (tanpa border kotak-kotak)
+            cell.s = signStyle;
           }
         }
       }
 
       worksheet["!merges"] = [
         { s: { r: 0, c: 0 }, e: { r: 0, c: 10 } },
-        { s: { r: rows.length - 1, c: 0 }, e: { r: rows.length - 1, c: 10 } }
+        { s: { r: lastRowIdx, c: 0 }, e: { r: lastRowIdx, c: 10 } },
+        // Merge untuk area tanda tangan kiri (Kolom B sampai D)
+        { s: { r: signStartIdx, c: 1 }, e: { r: signStartIdx, c: 3 } },
+        { s: { r: signStartIdx + 3, c: 1 }, e: { r: signStartIdx + 3, c: 3 } },
+        // Merge untuk area tanda tangan kanan (Kolom I sampai K)
+        { s: { r: signStartIdx, c: 8 }, e: { r: signStartIdx, c: 10 } },
+        { s: { r: signStartIdx + 3, c: 8 }, e: { r: signStartIdx + 3, c: 10 } }
       ];
 
       worksheet["!rows"] = [
@@ -668,7 +684,7 @@
       ];
 
       worksheet["!autofilter"] = {
-        ref: `A3:K${rows.length - 2}`
+        ref: `A3:K${signStartIdx - 1}`
       };
     }
 
@@ -738,6 +754,26 @@
       Object.keys(groupedByVendor).forEach(vendor => {
         const rows = groupedByVendor[vendor];
 
+        // Spasi kosong sebelum catatan kaki
+        rows.push([]);
+        
+        // Baris Tanda Tangan: Kiri (Disusun oleh di kolom B), Kanan (Mengetahui di kolom I)
+        let emptyRowSign1 = new Array(11).fill("");
+        emptyRowSign1[1] = "Disusun oleh,";
+        emptyRowSign1[8] = "Mengetahui,";
+        rows.push(emptyRowSign1);
+
+        // Baris kosong untuk ruang tanda tangan fisik
+        rows.push(new Array(11).fill(""));
+        rows.push(new Array(11).fill(""));
+
+        // Baris nama penanda tangan di bawah ruang kosong
+        let emptyRowSign2 = new Array(11).fill("");
+        emptyRowSign2[1] = "( ____________________ )";
+        emptyRowSign2[8] = "( ____________________ )";
+        rows.push(emptyRowSign2);
+
+        // Spasi sebelum catatan kaki di baris paling bawah
         rows.push([]);
         rows.push([
           `* Berkas gabungan sah digunakan sebagai bukti fisik penggunaan anggaran unit kerja. Dicetak otomatis pada tanggal: ${currentDate}`
