@@ -19,9 +19,10 @@
 
   <meta name="theme-color" content="#0056b3">
 
-  <style>
+    <style>
     body { 
-      background: linear-gradient(135deg, #f0f4f1 0%, #e2e8e4 100%); 
+      /* 🌟 WARNA BARU: Perpaduan hijau sage pucat yang sangat adem dan teduh di mata */
+      background: linear-gradient(135deg, #f0f5f2 0%, #d8e4dc 100%); 
       font-family: 'Plus Jakarta Sans', sans-serif;
       min-height: 100vh;
       display: flex;
@@ -29,29 +30,116 @@
       justify-content: center;
       padding: 2rem 1rem;
     }
-    .main-container { width: 100%; max-width: 750px; margin: 0 auto; }
-    .card-form { border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(19, 64, 45, 0.08); background: #ffffff; overflow: hidden; width: 100%; }
+    .main-container { 
+      width: 100%; 
+      max-width: 750px; 
+      margin: 0 auto; 
+    }
+    .card-form { 
+      border-radius: 20px; 
+      border: none; 
+      /* 🌟 PENYESUAIAN BAYANGAN: Diperhalus dengan bias warna hijau botol transparan agar kartu menyatu lembut */
+      box-shadow: 0 12px 40px rgba(19, 64, 45, 0.05); 
+      background: #ffffff; 
+      overflow: hidden; 
+      width: 100%; 
+    }
     
-    /* Tema Utama: Hijau Botol (Bottle Green) */
-    .brand-header { background: linear-gradient(135deg, #13402d 0%, #0b261b 100%); padding: 1.5rem; text-align: center; color: white; }
+    /* Tema Utama: Hijau Botol (Bottle Green Premium) */
+    .brand-header { 
+      background: linear-gradient(135deg, #13402d 0%, #0b261b 100%); 
+      padding: 1.5rem; 
+      text-align: center; 
+      color: white; 
+    }
     
-    .logo-container { width: 75px; height: 75px; background-color: #ffffff; border-radius: 50%; margin: 0 auto 0.8rem auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 6px; }
-    .logo-container img { width: 100%; height: 100%; object-fit: contain; }
-    .form-section { padding: 2.5rem; }
-    .inner-card { border-radius: 15px; border: 1px solid #e2ece6; background-color: #f6faf7; padding: 1.5rem; }
-    .form-label { font-weight: 600; color: #2d3748; font-size: 0.9rem; }
-    .form-control, .form-select { border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0.6rem 1rem; font-size: 0.95rem; }
-    .form-control:focus, .form-select:focus { border-color: #13402d; box-shadow: 0 0 0 0.25rem rgba(19, 64, 45, 0.15); }
+    .logo-container { 
+      width: 75px; 
+      height: 75px; 
+      background-color: #ffffff; 
+      border-radius: 50%; 
+      margin: 0 auto 0.8rem auto; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      box-shadow: 0 4px 12px rgba(19, 64, 45, 0.12); 
+      padding: 6px; 
+    }
+    .logo-container img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: contain; 
+    }
+    .form-section { 
+      padding: 2.5rem; 
+    }
+    
+    /* 🌟 KOTAK INPUT BARANG: Penyesuaian ke warna latar hijau mint super pucat agar serasi */
+    .inner-card { 
+      border-radius: 15px; 
+      border: 1px solid #e1ebe5; 
+      background-color: #f7faf8; 
+      padding: 1.5rem; 
+    }
+    .form-label { 
+      font-weight: 600; 
+      color: #2d3748; 
+      font-size: 0.9rem; 
+    }
+    .form-control, .form-select { 
+      border-radius: 10px; 
+      border: 1.5px solid #cbd5e1; 
+      padding: 0.6rem 1rem; 
+      font-size: 0.95rem; 
+      transition: all 0.2s ease;
+    }
+    
+    /* 🌟 EFEK SAKLAR FOKUS: Saat kotak diklik, memancarkan bias cahaya hijau botol yang elegan */
+    .form-control:focus, .form-select:focus { 
+      border-color: #1f6f4a; 
+      box-shadow: 0 0 0 3.5px rgba(19, 64, 45, 0.12); 
+      outline: none;
+    }
     
     /* Tombol Tambah & Kirim dengan nuansa hijau/aksen serasi */
-    .btn-add { background: #22543d; border: none; color: white; border-radius: 10px; font-weight: 600; padding: 0.7rem; }
-    .btn-add:hover { background: #1a4231; color: white; }
-    .btn-submit { background: linear-gradient(135deg, #13402d 0%, #1f6f4a 100%); border: none; border-radius: 12px; }
-    .btn-submit:hover { background: linear-gradient(135deg, #0b261b 0%, #13402d 100%); }
+    .btn-add { 
+      background: #2d6a4f; 
+      border: none; 
+      color: white; 
+      border-radius: 10px; 
+      font-weight: 600; 
+      padding: 0.7rem; 
+      transition: all 0.2s ease;
+    }
+    .btn-add:hover { 
+      background: #1b4332; 
+      color: white; 
+      transform: translateY(-1px);
+    }
+    .btn-submit { 
+      background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%); 
+      border: none; 
+      border-radius: 12px; 
+      padding: 0.8rem;
+      box-shadow: 0 4px 15px rgba(27, 67, 50, 0.2);
+      transition: all 0.2s ease;
+    }
+    .btn-submit:hover { 
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(27, 67, 50, 0.3);
+    }
     
-    .loading-overlay { font-size: 0.85rem; font-weight: 500; color: #64748b; }
-    .spinner-custom { width: 1.2rem; height: 1.2rem; border-width: 0.18em; color: #13402d !important; }
-  </style>
+    .loading-overlay { 
+      font-size: 0.85rem; 
+      font-weight: 500; 
+      color: #64748b; 
+    }
+    .spinner-custom { 
+      width: 1.2rem; 
+      height: 1.2rem; 
+      border-width: 0.18em; 
+      color: #13402d !important; 
+    }
   </style>
 </head>
 
